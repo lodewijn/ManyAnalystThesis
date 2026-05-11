@@ -1,0 +1,106 @@
+\efloatseparator
+ 
+\begin{longtable*}[t]{>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{5cm}>{\raggedleft\arraybackslash}p{1.2cm}>{\raggedleft\arraybackslash}p{1.2cm}>{\raggedleft\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{2cm}>{\raggedleft\arraybackslash}p{1.2cm}}
+\toprule
+Decision & Option & Succesful Universes & Non-convergence & Mean RR & RR Range & \% Sig\\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{\textit{(continued)}}\\
+\toprule
+Decision & Option & Succesful Universes & Non-convergence & Mean RR & RR Range & \% Sig\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+Statistical Model & Log-binomial & 232 & 1102 & 0.83 & {}[0.71, 0.98] & 100\%\\
+Statistical Model & Mixed effects logistic regression & 1278 & 0 & 0.92 & {}[0.73, 1.07] & 77\%\\
+Statistical Model & Discrete-time mixed effects & 832 & 0 & 0.92 & {}[0.76, 1.07] & 74\%\\
+Statistical Model & GEE & 1052 & 221 & 0.95 & {}[0.8, 1.06] & 85\%\\
+Statistical Model & Logistic regression & 1188 & 164 & 0.95 & {}[0.8, 1.14] & 93\%\\
+Statistical Model & Cox PH & 331 & 0 & 1.08 & {}[0.84, 1.68] & 24\%\\
+Data Type & Cross-sectional (all waves) & 1237 & 403 & 0.93 & {}[0.74, 1.07] & 91\%\\
+Data Type & Longitudinal (wave 1) & 1669 & 563 & 0.93 & {}[0.71, 1.68] & 69\%\\
+Data Type & Longitudinal (no strict baseline) & 1869 & 411 & 0.95 & {}[0.75, 1.35] & 82\%\\
+Data Type & Cross-sectional (wave 1) & 138 & 110 & 0.97 & {}[0.77, 1.14] & 86\%\\
+Missing Data & Complete cases & 2584 & 637 & 0.94 & {}[0.72, 1.68] & 80\%\\
+Missing Data & No information & 2329 & 850 & 0.94 & {}[0.71, 1.68] & 80\%\\
+Exclusion Criteria & Country & 833 & 261 & 0.93 & {}[0.73, 1.54] & 76\%\\
+Exclusion Criteria & Divorced/widowed & 819 & 277 & 0.93 & {}[0.73, 1.47] & 79\%\\
+Exclusion Criteria & Married before 18 & 778 & 248 & 0.94 & {}[0.71, 1.45] & 82\%\\
+Exclusion Criteria & None & 804 & 263 & 0.94 & {}[0.73, 1.56] & 80\%\\
+Exclusion Criteria & Born after 1954 & 886 & 209 & 0.95 & {}[0.74, 1.68] & 83\%\\
+Exclusion Criteria & Younger than 55 & 793 & 229 & 0.95 & {}[0.76, 1.67] & 79\%\\
+Outcome & Age event + Death + Event ever + Since & 644 & 193 & 0.92 & {}[0.73, 1.06] & 84\%\\
+Outcome & Death + Event ever + Since & 656 & 182 & 0.92 & {}[0.71, 1.06] & 84\%\\
+Outcome & Age event + Death + Event ever & 707 & 177 & 0.93 & {}[0.75, 1.16] & 76\%\\
+Outcome & Age event + Event ever + Since & 617 & 216 & 0.93 & {}[0.74, 1.07] & 86\%\\
+Outcome & Death + Event ever & 761 & 187 & 0.93 & {}[0.72, 1.13] & 76\%\\
+Outcome & Event ever & 695 & 266 & 0.95 & {}[0.73, 1.14] & 83\%\\
+Outcome & Age event + Event ever & 833 & 266 & 0.98 & {}[0.77, 1.68] & 72\%\\
+Adjustment Set & Smoke + Sex & 81 & 19 & 0.83 & {}[0.74, 1.35] & 97\%\\
+Adjustment Set & Country + Sex & 100 & 0 & 0.83 & {}[0.73, 1.12] & 95\%\\
+Adjustment Set & Sex & 100 & 0 & 0.83 & {}[0.71, 1.22] & 93\%\\
+Adjustment Set & Smoke + Edu + Sex & 65 & 35 & 0.84 & {}[0.75, 1.01] & 93\%\\
+Adjustment Set & Smoke + Country + Edu + Sex & 74 & 26 & 0.85 & {}[0.74, 1.16] & 94\%\\
+Adjustment Set & Smoke + Country + Sex & 85 & 15 & 0.85 & {}[0.75, 1.03] & 90\%\\
+Adjustment Set & Edu + Sex & 75 & 25 & 0.85 & {}[0.76, 1.31] & 90\%\\
+Adjustment Set & Sex + Phys & 100 & 0 & 0.85 & {}[0.76, 1.39] & 94\%\\
+Adjustment Set & Smoke & 86 & 14 & 0.86 & {}[0.77, 1.08] & 98\%\\
+Adjustment Set & Smoke + Edu + Sex + Phys & 66 & 34 & 0.86 & {}[0.77, 1.2] & 96\%\\
+Adjustment Set & Country + Edu + Sex & 73 & 27 & 0.86 & {}[0.75, 1.22] & 91\%\\
+Adjustment Set & Country + Sex + Phys & 79 & 21 & 0.86 & {}[0.77, 1.01] & 97\%\\
+Adjustment Set & Edu + Sex + Phys & 68 & 32 & 0.86 & {}[0.8, 1.02] & 96\%\\
+Adjustment Set & Smoke + Country + Edu + Sex + Phys & 63 & 37 & 0.87 & {}[0.78, 1] & 93\%\\
+Adjustment Set & Smoke + Country + Sex + Phys & 72 & 28 & 0.87 & {}[0.77, 1.21] & 92\%\\
+Adjustment Set & Smoke + Sex + Phys & 84 & 16 & 0.87 & {}[0.8, 1.38] & 94\%\\
+Adjustment Set & None & 100 & 0 & 0.87 & {}[0.76, 1.28] & 97\%\\
+Adjustment Set & Smoke + Country & 87 & 13 & 0.88 & {}[0.78, 1.26] & 96\%\\
+Adjustment Set & Country & 100 & 0 & 0.88 & {}[0.76, 1.24] & 98\%\\
+Adjustment Set & Country + Edu + Sex + Phys & 73 & 27 & 0.89 & {}[0.79, 1.25] & 91\%\\
+Adjustment Set & Edu & 78 & 22 & 0.89 & {}[0.79, 1.13] & 99\%\\
+Adjustment Set & Smoke + Country + Edu & 66 & 34 & 0.90 & {}[0.79, 1.21] & 93\%\\
+Adjustment Set & Smoke + Edu & 67 & 33 & 0.90 & {}[0.79, 1.41] & 95\%\\
+Adjustment Set & Phys & 100 & 0 & 0.90 & {}[0.81, 1.12] & 100\%\\
+Adjustment Set & Country + Edu & 75 & 25 & 0.91 & {}[0.81, 1.21] & 93\%\\
+Adjustment Set & Smoke + Country + Phys & 84 & 16 & 0.92 & {}[0.82, 1.1] & 94\%\\
+Adjustment Set & Smoke + Phys & 87 & 13 & 0.92 & {}[0.81, 1.25] & 93\%\\
+Adjustment Set & Country + Phys & 100 & 0 & 0.92 & {}[0.82, 1.31] & 96\%\\
+Adjustment Set & Edu + Phys & 79 & 21 & 0.93 & {}[0.83, 1.24] & 98\%\\
+Adjustment Set & Smoke + Country + Edu + Phys & 69 & 31 & 0.94 & {}[0.83, 1.27] & 95\%\\
+Adjustment Set & Smoke + Edu + Phys & 75 & 25 & 0.94 & {}[0.84, 1.47] & 95\%\\
+Adjustment Set & Country + Edu + Phys & 72 & 28 & 0.94 & {}[0.83, 1.27] & 92\%\\
+Adjustment Set & Age + Smoke + Sex & 74 & 26 & 0.96 & {}[0.87, 1.24] & 82\%\\
+Adjustment Set & Age + Country + Edu + Sex & 69 & 31 & 0.96 & {}[0.87, 1.02] & 63\%\\
+Adjustment Set & Age + Edu + Sex & 60 & 40 & 0.96 & {}[0.88, 1.09] & 80\%\\
+Adjustment Set & Age + Sex & 82 & 18 & 0.96 & {}[0.88, 1.03] & 88\%\\
+Adjustment Set & Age + Smoke + Country + Edu + Sex & 62 & 38 & 0.97 & {}[0.84, 1.3] & 69\%\\
+Adjustment Set & Age + Smoke + Edu + Sex & 68 & 32 & 0.97 & {}[0.89, 1.41] & 79\%\\
+Adjustment Set & Age + Smoke + Sex + Phys & 79 & 21 & 0.97 & {}[0.9, 1.33] & 77\%\\
+Adjustment Set & Age + Country + Sex & 77 & 23 & 0.97 & {}[0.87, 1.28] & 68\%\\
+Adjustment Set & Age + Sex + Phys & 79 & 21 & 0.97 & {}[0.88, 1.56] & 78\%\\
+Adjustment Set & Age + Smoke + Country + Edu + Sex + Phys & 61 & 39 & 0.98 & {}[0.88, 1.26] & 54\%\\
+Adjustment Set & Age + Smoke + Country + Sex & 75 & 25 & 0.98 & {}[0.84, 1.35] & 65\%\\
+Adjustment Set & Age + Smoke + Edu + Sex + Phys & 62 & 38 & 0.98 & {}[0.88, 1.57] & 80\%\\
+Adjustment Set & Age + Country + Edu + Sex + Phys & 80 & 20 & 0.98 & {}[0.87, 1.33] & 57\%\\
+Adjustment Set & Age + Country + Sex + Phys & 86 & 14 & 0.98 & {}[0.85, 1.33] & 57\%\\
+Adjustment Set & Age + Edu + Sex + Phys & 65 & 35 & 0.98 & {}[0.88, 1.33] & 76\%\\
+Adjustment Set & Age + Smoke + Country + Sex + Phys & 72 & 28 & 0.99 & {}[0.87, 1.32] & 43\%\\
+Adjustment Set & Age + Smoke & 75 & 25 & 1.01 & {}[0.92, 1.04] & 37\%\\
+Adjustment Set & Age & 87 & 13 & 1.02 & {}[0.98, 1.42] & 33\%\\
+Adjustment Set & Age + Smoke + Edu & 80 & 20 & 1.02 & {}[0.96, 1.13] & 27\%\\
+Adjustment Set & Age + Smoke + Edu + Phys & 61 & 39 & 1.03 & {}[0.94, 1.67] & 51\%\\
+Adjustment Set & Age + Smoke + Country & 73 & 27 & 1.04 & {}[0.95, 1.42] & 44\%\\
+Adjustment Set & Age + Smoke + Country + Edu & 67 & 33 & 1.04 & {}[0.96, 1.2] & 60\%\\
+Adjustment Set & Age + Smoke + Country + Edu + Phys & 66 & 34 & 1.04 & {}[0.94, 1.45] & 77\%\\
+Adjustment Set & Age + Country & 87 & 13 & 1.04 & {}[0.98, 1.28] & 74\%\\
+Adjustment Set & Age + Edu & 71 & 29 & 1.04 & {}[0.99, 1.63] & 48\%\\
+Adjustment Set & Age + Phys & 85 & 15 & 1.04 & {}[0.98, 1.34] & 60\%\\
+Adjustment Set & Age + Smoke + Country + Phys & 78 & 22 & 1.05 & {}[0.98, 1.4] & 82\%\\
+Adjustment Set & Age + Smoke + Phys & 68 & 32 & 1.05 & {}[0.97, 1.68] & 58\%\\
+Adjustment Set & Age + Country + Edu & 63 & 37 & 1.05 & {}[0.98, 1.37] & 75\%\\
+Adjustment Set & Age + Country + Edu + Phys & 71 & 29 & 1.05 & {}[1, 1.47] & 78\%\\
+Adjustment Set & Age + Country + Phys & 77 & 23 & 1.05 & {}[0.99, 1.45] & 70\%\\
+Adjustment Set & Age + Edu + Phys & 70 & 30 & 1.05 & {}[1, 1.54] & 59\%\\*
+\end{longtable*}

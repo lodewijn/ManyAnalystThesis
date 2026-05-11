@@ -1,0 +1,308 @@
+---
+title: "Discussion Draft"
+shorttitle: "Discussion Draft"
+abstract: | 
+    Hallo
+keywords: [open science, preregistration, preregistration deviation, reproducibility crisis, p-hacking, simulation study, metascience, type I error, type II error, social science, psychology]
+author:
+  - name: Name
+    affiliations: Universiteit
+    corresponding: true
+    orcid: 0000-0000-0000-0000
+    role: 
+    - conceptualization
+    - methodology
+    - investigation
+    - formal analysis
+    - software
+    - visualization
+    - writing
+author-note:
+  disclosures:
+    conflict-of-interest: The author(s) declare that there were no conflicts of interest with respect to the authorship or the publication of this article.
+format:
+  apaquarto-pdf: 
+    keep-tex: true
+    floatsintext: true
+    include-in-header:
+      text: |
+        \AtBeginDocument{\thispagestyle{empty}}
+        \usepackage{tabularx}
+        \usepackage{threeparttable}
+        \usepackage{ragged2e}
+        \usepackage{booktabs}
+editor: visual
+bibliography: ref_07-05-26.bib
+csl: apa.csl
+---
+
+```{r setup, echo = F, include = F, warning = F, message = F}
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(kSamples)
+library(tibble)
+library(kableExtra)
+library(stats)
+
+decision_space_raw <- read_csv(here("data/decision_space/decision_space_raw.csv"))
+decision_space <- read_csv(here("data/decision_space/decision_space.csv"))
+sampled_universes <- readRDS(here("data/sampled_universes/sampled_universes_100.RDS"))
+results <- readRDS(here("data/results/corrected_results_final_2026-04-28.RDS"))
+
+# Make sure all NAs are seen as NAs
+results <- results %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+
+# How are NAs distributed per statistical model?
+NAperModel <- results %>%
+  group_by(model_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+# How are NAs distributed acrsoss adjustments within log-binomial models?
+NAperLogBinom <- results %>%
+  filter(model_type == "log_reg") %>%
+  group_by(adjustment_label) |>
+  summarise(na_count = sum(is.na(RR))) |>
+  arrange(na_count)
+
+# For percentages, make sure only the converged specification results are used 
+# (not the full sample as this would underestimate the % - more row numbers than RRs)
+
+n_total <- results |> filter(!is.na(RR)) |> nrow()
+
+descRR <- results |>
+  filter(!is.na(RR)) |>
+  summarise(min = round(min(RR), 2),
+    max = round(max(RR), 2),
+    percSig = sum(p.value < 0.05)/n_total * 100,
+    perc_neg_sig  = sum(p.value < 0.05 & RR < 1) / n_total * 100,
+    perc_pos_sig  = sum(p.value < 0.05 & RR > 1) / n_total * 100,
+    perc_nonsig   = sum(p.value >= 0.05) / n_total * 100,
+    median = round(median(RR), 2),
+    mean = round(mean(RR), 2),
+    sd = round(sd(RR), 2))
+
+converged_results <- nrow(sampled_universes) - sum(is.na(results$RR))
+```
+```{r ad setup, echo = F, include = F, warning = F, message = F}
+set.seed(260722)
+DT_AD <- ad.test(RR ~ data_type, data = results)
+MD_AD <- ad.test(RR ~ missing_data, data = results)
+EC_AD <- ad.test(RR ~ exclusion, data = results)
+OUT_AD <- ad.test(RR ~ outcome_label, data = results)
+ADJ_AD <- ad.test(RR ~ adjustment_label, data = results)
+SM_AD <- ad.test(RR ~ model_type, data = results)
+
+ADtable <- tibble(
+  Decision = c("Data Type", "Missing Data", "Exclusion Criteria", 
+               "Outcome", "Statistical Model", "Adjustment Set"), 
+  `N options` = c(DT_AD$k, MD_AD$k, EC_AD$k, OUT_AD$k, SM_AD$k, ADJ_AD$k),
+  T.AD = c(DT_AD$ad[1,2], MD_AD$ad[1,2], EC_AD$ad[1,2], 
+             OUT_AD$ad[1,2], SM_AD$ad[1,2], ADJ_AD$ad[1,2]),
+  p_value = c(DT_AD$ad[1,3], MD_AD$ad[1,3], EC_AD$ad[1,3], 
+                OUT_AD$ad[1,3], SM_AD$ad[1,3], ADJ_AD$ad[1,3])
+) |>
+  arrange(T.AD)
+```
+```{r full RR table setup, echo = F, include = F, warning = F, message =F}
+decisions <- c("model_type", "data_type", "missing_data", "exclusion", "outcome_label", "adjustment_label")
+
+# Create label mappings
+decision_labels <- c(
+  "data_type" = "Data Type",
+  "missing_data" = "Missing Data",
+  "exclusion" = "Exclusion Criteria",
+  "outcome_label" = "Outcome",
+  "model_type" = "Statistical Model",
+  "adjustment_label" = "Adjustment Set"
+)
+
+option_labels <- c(
+  # Data type
+  "cross_all" = "Cross-sectional (all waves)",
+  "cross_w1" = "Cross-sectional (wave 1)",
+  "long_nostrict" = "Longitudinal (no strict baseline)",
+  "long_w1" = "Longitudinal (wave 1)",
+  
+  # Missing data
+  "cc" = "Complete cases",
+  "ni" = "No information",
+  
+  # Exclusion
+  "born_after1954" = "Born after 1954",
+  "country" = "Country",
+  "divorced_widowed" = "Divorced/widowed",
+  "married_before18" = "Married before 18",
+  "none" = "None",
+  "younger_than_55_w1" = "Younger than 55",
+  
+  # Model type
+  "cox_haz" = "Cox PH",
+  "log_reg" = "Logistic regression",
+  "log-binom" = "Log-binomial",
+  "mix_log_reg" = "Mixed effects logistic regression",
+  "time_mix" = "Discrete-time mixed effects",
+  "GEE" = "GEE"
+)
+
+# Create table with nice labels
+full_table <- map_dfr(decisions, function(d) {
+  results %>%
+    group_by(Option = .data[[d]]) %>%
+    summarise(
+      N_total = n(),
+      N_failed = sum(is.na(RR)),
+      N_valid = sum(!is.na(RR)),
+      `Mean RR` = round(mean(RR, na.rm = TRUE), 2),
+      `RR Range` = paste0("[", round(min(RR, na.rm = TRUE), 2), ", ", round(max(RR, na.rm = TRUE), 2), "]"),
+      `% Sig` = paste0(round(mean(p.value < 0.05, na.rm = TRUE) * 100, 0), "%"),
+      .groups = "drop"
+    ) %>%
+    arrange(`Mean RR`) %>%
+    mutate(
+      Decision = decision_labels[d],
+      Option = ifelse(Option %in% names(option_labels), option_labels[Option], Option)
+    ) %>%
+    select(Decision, Option, N_valid, N_failed, `Mean RR`, `RR Range`, `% Sig`)
+})
+
+# Clean adjustment labels in the data first
+full_table <- full_table %>%
+  mutate(
+    Option = Option %>%
+      str_replace_all("dn010_", "Edu") %>%
+      str_replace_all("dn042_", "Sex") %>%
+      str_replace_all("br001_", "Smoke") %>%
+      str_replace_all("phactiv", "Phys") %>%
+      str_replace_all("country", "Country") %>%
+      str_replace_all("age_int", "Age") %>%
+      str_replace_all("none", "None") %>%
+      str_replace_all("since_last_int", "Since") |>
+      str_replace_all("age_at_event", "Age event") %>%
+      str_replace_all("death_by_event", "Death") %>%
+      str_replace_all("event_ever", "Event ever") %>%
+      str_replace_all("\\+", " + ")
+  )
+
+summary_full_table <- full_table %>%
+    group_by(Decision) %>%
+    summarise(
+      min = round(min(`Mean RR`), 2),
+      max = round(max(`Mean RR`), 2),   
+      range = abs(round(min(`Mean RR`) - max(`Mean RR`),2)),
+      .groups = "drop"
+    ) |>
+  arrange(range)
+```
+```{r KS test setup, echo = F, include = F, warning = F, message = F}
+df_adj <- results %>%
+  filter(!is.na(RR)) |>
+  mutate(
+    has_none = grepl("none", adjustment_label, ignore.case = TRUE),
+    has_age = grepl("age_int", adjustment_label, ignore.case = TRUE),
+    has_sex = grepl("dn042_", adjustment_label, ignore.case = TRUE),
+    has_country = grepl("country", adjustment_label, ignore.case = TRUE),
+    has_smoking = grepl("br001_", adjustment_label, ignore.case = TRUE),
+    has_education = grepl("dn010_", adjustment_label, ignore.case = TRUE),
+    has_activity = grepl("phactiv", adjustment_label, ignore.case = TRUE)
+  )
+
+# KS test for each confounder
+ks_none <- ks.test(df_adj$RR[df_adj$has_none], df_adj$RR[!df_adj$has_none])
+ks_age <- ks.test(df_adj$RR[df_adj$has_age], df_adj$RR[!df_adj$has_age])
+ks_sex <- ks.test(df_adj$RR[df_adj$has_sex], df_adj$RR[!df_adj$has_sex])
+ks_country <- ks.test(df_adj$RR[df_adj$has_country], df_adj$RR[!df_adj$has_country])
+ks_smoking <- ks.test(df_adj$RR[df_adj$has_smoking], df_adj$RR[!df_adj$has_smoking])
+ks_education <- ks.test(df_adj$RR[df_adj$has_education], df_adj$RR[!df_adj$has_education])
+ks_activity <- ks.test(df_adj$RR[df_adj$has_activity], df_adj$RR[!df_adj$has_activity])
+
+# Combine results
+ks_results <- data.frame(
+  `Adjustment variable` = c("None", "Age", "Sex", "Country", "Smoking", "Education", "Physical activity"),
+  Included = c(sum(df_adj$has_none), sum(df_adj$has_age), sum(df_adj$has_sex), 
+               sum(df_adj$has_country), sum(df_adj$has_smoking), sum(df_adj$has_education), 
+               sum(df_adj$has_activity)),
+  Excluded = c(sum(!df_adj$has_none), sum(!df_adj$has_age), sum(!df_adj$has_sex), 
+               sum(!df_adj$has_country), sum(!df_adj$has_smoking), sum(!df_adj$has_education), 
+               sum(!df_adj$has_activity)),
+  D = c(ks_none$statistic, ks_age$statistic, ks_sex$statistic, ks_country$statistic, 
+        ks_smoking$statistic, ks_education$statistic, ks_activity$statistic),
+  p.value = c(ks_none$p.value, ks_age$p.value, ks_sex$p.value, ks_country$p.value,
+        ks_smoking$p.value, ks_education$p.value, ks_activity$p.value), 
+  check.names = F
+)
+
+ks_results$D <- round(ks_results$D, 3)
+ks_results$p.value <- ifelse(ks_results$p.value < 0.001, "< .001", round(ks_results$p.value, 3))
+
+ks_results <- ks_results |>
+  arrange(D)
+```
+```{r age and sex across groups, echo = F, include = F, warning = F, message = F}
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+df <- exposure_function(df)
+
+descSHARE <- df |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            NMale = sum(ifelse(dn042_ == "Male", 1, 0)),
+            NFemale = sum(ifelse(dn042_ == "Female", 1, 0)), 
+            pctFemale = mean(dn042_ == "Female", na.rm = TRUE) * 100)
+```
+
+# Discussion
+The present multiverse analysis aimed to quantify the relative contribution of harmful versus helpful analytical decisions to effect size variation for the association between marital status and cardiovascular events, based on the many-analyst project by @kowall_marital_2025. Across `r format(converged_results, big.mark = ",")` specifications, risk ratio estimates ranged from `r descRR$min` to `r descRR$max`, with `r round(descRR$percSig, 1)`% of the universes yielding significant results. Marriage was found to be both protective and harmful for cardiovascular health depending on the analytical specification. This underscores that different analytical pathways can lead to substantially different conclusions --- a pattern consistent with findings from earlier many-analyst projects [e.g., @silberzahn_many_2018; @bastiaansen_time_2020; @breznau_observing_2022; @gould_same_2025; @kowall_marital_2025; @botvinik-nezer_variability_2020].
+
+Although the Anderson-Darling tests showed statistically significant distributional differences for all decisions, indicating they were all sensitive, statistical model and adjustment set emerged as the most prominent drivers of variation in RR distributions. When applying the AB-framework classification, both a harmful source of variation---statistical model---and a helpful source---adjustment set---contributed meaningfully to effect size variability. All other decisions, despite reaching statistical significance, showed minimal visual distributional differences across options, suggesting their impact on effect size variability was small. This was reinforced by the descriptive plots and T.AD values, which suggest that only statistical model and adjustment set had meaningful impact.
+
+## Helpful Sources of Variation
+A closer examination of adjustment set sensitivity using Kolmogorov-Smirnov tests showed that age, sex, and not including any confounders were the most important drivers of distributional differences in the results. Age and sex showed opposing patterns: controlling for age attenuated the protective effect of marriage, while controlling for sex strengthened it. A possible explanation for this pattern is the distribution of these variables over the groups in the underlying data. Unmarried individuals were on average four years older and predominantly female (`r round(descSHARE$pctFemale[descSHARE$exposure == 0], 0)`%), meaning the married and unmarried groups differed systematically in age and sex. Without adjustment for these variables, the estimated effect of marriage on cardiovascular events therefore reflects not only the effect of marriage itself, but also these compositional differences between groups. The younger average age of married individuals may have inflated the apparent protective effect of marriage, while the higher proportion of males in this group may have attenuated it, given that men have greater cardiovascular risk [@pana_sex-specific_2024]. 
+
+From a causal inference perspective, the inclusion of covariates shifts the estimation from a total effect to a direct effect [@rohrer_thinking_2018]. Without adjustment, the comparison between married and unmarried individuals mixes the effect of marriage with differences in age and sex composition between the groups, rather than isolating the effect of marriage itself. Adjusting for age, for example, estimates the effect of marriage among people of the same age, and similarly for sex. The observed sensitivity to these covariates therefore reflects a genuine difference in what is being estimated, not arbitrary noise---the kind of variation the AB-framework would characterise as helpful.
+
+Consistent with the T.AD values, the pattern observed for the no-confounders condition (see fig-dens-ADJ when 'none' was excluded) closely resembled that of the age-exclusion condition, suggesting that age was the most important variable affecting the decision sensitivity of the adjustment set. When no confounders were included, risk ratio estimates were lower, and when any confounder was included, the estimates shifted towards higher values. This supports the interpretation that variation in the results in this case represents sensitivity to the causal structure of the data.
+
+## Harmful Sources of Variation
+When looking at the harmful decisions, statistical models were the most important drivers of variation in the results. Especially Cox and log-binomial models resulted in visually different distributions of risk ratios (see fig-dens-plot). It is important to note that when setting up the multiverse, it was evident that the choice of statistical models was not an independent decision. For example, only three out of seven outcome operationalisations contained time-to-event data, and only two out of four data types were compatible with Cox models. Choosing this statistical model therefore implicitly constrained other facets of the analysis. Crucially, even after conversion to risk ratios, Cox models consistently yielded substantially higher estimates than other modelling approaches, although these were often non-significant. This suggests that model assumptions can even fundamentally alter the conclusion.
+
+Additionally, `r format(full_table$N_failed[full_table$Option == "Log-binomial"], big.mark = ",")` log-binomial models failed to converge---whereas only `r format(full_table$N_valid[full_table$Option == "Log-binomial"], big.mark = ",")` were successful. Non-convergence occurred most often when the adjustment sets increased in size, which connects to a known limitation of the model [@zhu_refinements_2024]. Log-binomial models restrict predicted disease probabilities to lie between zero and one, which in turn bounds the values the regression coefficients can take [@williamson_log-binomial_2013]. Convergence failure arises when the maximum likelihood solution sits on the boundary of the parameter space, when at least one combination of covariates results in an estimated probability of exactly one [@zhu_refinements_2024]. This may become more likely as adjustment sets grow, since larger sets may be more likely to produce covariate combinations that hit this boundary. Notably, convergence behaviour for log-binomial models may be software-specific [@williamson_log-binomial_2013]. In the present study, all analyses were conducted in R, so this was not accounted for, meaning that some of the observed non-convergence may reflect software choices rather than properties of the model itself.
+
+Choosing a log-binomial model is therefore not an independent analytical decision, as its convergence depends at least partly on size of the adjustment set. A similar dependency arises with GEE models, which cannot handle missing data and therefore force an explicit decision about missingness, whereas other models default to complete-case analysis when nothing is specified. This means that model choice in this case again requires choices elsewhere in the analytical pathway. Importantly, choices regarding missing data in itself can also have implications that go beyond arbitrary noise. If data are not missing at random, listwise deletion could result in not including a subpopulation with a certain characteristic in the analysis. Moreover, when confounders are missing not at random, causal effects are not identifiable [@yang_causal_2019].
+
+Taken together, these examples reveal a fundamental limitation of the AB-framework: analytical decisions do not exist in isolation, so categorising them as such is problematic. Decisions about statistical models are entangled with data structure requirements, missing data handling and variable operationalisation. This means that many harmful decisions may in fact carry substantive assumptions that cannot be separated from potential arbitrary variation the framework was designed to identify.
+
+## Comparison With Original Many-Analyst Study
+The range of effect sizes found in this study was broadly in line with that of the original many-analyst project by @kowall_marital_2025, where effect sizes ranged from 0.72 (OR) to 1.31 (HR). After applying the risk ratio conversions used in the present study, the original effect sizes would correspond to a range of approximately `r round(sqrt(0.72), 2)` to `r round((1 - 0.5^sqrt(1.31)) / (1 - 0.5^sqrt(1/1.31)),2)`, indicating the original study captured a slightly narrower range than the present multiverse. This is not surprising, as the original study only included sixteen analyses, compared to `r format(converged_results, big.mark = ",")` analyses.
+
+Despite the overlap in effect size ranges, the two studies diverged in identifying the main sources of variability. In contrast to the current study, @kowall_marital_2025 identified the data type (cross-sectional versus longitudinal) as the main source of variation, with statistical model and the adjustment set playing only a minor role---the opposite of the present findings. This inconsistency could reflect a fundamental difference between the two approaches. Whereas @kowall_marital_2025 varied one decision at a time under a fixed configuration, this multiverse analysis combined all decisions simultaneously and captured their combined influence across the entire decision space.
+
+Another potential explanation for the discrepancy between studies is the finding that adjustment set sensitivity was driven primarily by age and sex. In @kowall_marital_2025, twelve out of sixteen researchers included both age and sex in their analyses, and the additional sensitivity analyses also held these variables constant. Most researchers in the original study thus estimated the direct effect of marriage on cardiovascular events, leaving little data available about the effect of not including these confounders. This may potentially have attenuated the observed sensitivity to adjustment set decisions.
+
+Rather than contradicting the original study, the present findings extend it. When analytical decisions are varied jointly, rather than in isolation, this can provide a different assessment of decision sensitivity.
+
+## Limitations
+A first limitation concerns the inferential method used to assess decision sensitivity. The k-sample Anderson-Darling test proved to be sensitive to sample size . With `r format(converged_results, big.mark = ",")` specifications, even minimal distributional differences resulted in significant results. The universal significance across all decisions therefore likely reflects the number of specifications rather than substantive distributional differences. While the AD test yielded a useful measure of between-decision sensitivity, combining it with descriptive methods rather than relying on p-values alone would provide a more informative picture of decision sensitivity. Moreover, future research should explore inferential methods that are less susceptible to the large sample sizes characteristic of multiverse analyses, and explicitly account for the dependency structure between decisions and specifications.
+
+A second limitation is the generalisability of the results of the multiverse study. The relative contribution of harmful versus helpful analytical decisions will likely vary across studies, given the wide variety of topics and research questions across many-analyst projects [e.g., @silberzahn_many_2018; @hoogeveen_many-analysts_2023; @gould_same_2025; @kowall_marital_2025]. It does not seem realistic to expect that the results of this study directly apply to other projects. The decisions that proved to be most influential here---statistical model and adjustment set---are not necessarily the main sources of variation in other contexts, or even in the same context when decisions are varied one at a time rather than jointly, as the comparison with @kowall_marital_2025 illustrates. Replicating this multiverse analysis across different many-analyst projects, preferably with a wide range of research questions and data structures, might reveal more general patterns in decision sensitivity. However, assuming that such patterns exist may perhaps already be too bold.
+
+Another limitation is the conversion of effect sizes. While this has benefits for comparability across statistical models, the converged risk ratios are always an approximation. According to @vanderweele_optimal_2020, the square root transformation of the odds ratio gives a reasonably good approximation and differs from the true risk ratio by at most 25%, when the prevalence lies within 20%--80%. In case of hazard ratios, the conversion will place the value within 16% of the true risk ratios when the prevalence lies within 20%--80%, and 45% of the risk ratio if the prevalence is between 10%--90%, which is the case in the present study. This highlights that even though converting effect sizes can have benefits for inter-model comparisons, at the same time this may have introduced, or reduced, arbitrary variance in the results.
+
+## Future Recommendations
+The current findings raise a broader question: what should analysts do when analytical choices can fundamentally alter the conclusions of their research? Multiverse analysis cannot determine which specification is "correct", and the present study showed that substantial variability in effect estimates was found even within multiple defensible analytical paths. To ensure that the effects of analytical variability can be assessed properly, it is recommended to perform multiverse analysis, not only as a measure of robustness, but also as a transparent representation of the space of plausible conclusions [@botvinik-nezer_variability_2020].
+
+Future research should explore inferential methods to quantify decision sensitivity that are more suitable and robust to the large samples in multiverse analysis. Additionally, extending these methods to allow the derivation of a unique result that integrates all uncertain decisions remains an open area of research [@aczel_consensus-based_2021]. In addition to developing new methods, researchers should emphasize ground their decisions in theory and causal reasoning rather than idiosyncratic choices. Notably, only three of the sixteen teams in @kowall_marital_2025 used directed acyclic graphs (DAGs), and even those differed significantly. Specifying analytical decisions in pre-registrations, constructing DAGs before starting the analysis, and making causal assumptions explicit could help reduce researchers' unknown degrees of freedom [@botvinik-nezer_variability_2020]. In combination with the openly sharing data and code, this would not eliminate analytical variability, but would ensure that its effects can be assessed in a transparent manner to meaningfully interpret variation in the results and associated substantive conclusions.
+
+
+
+\newpage
+# References
+
+```{r}
+full_table
+```

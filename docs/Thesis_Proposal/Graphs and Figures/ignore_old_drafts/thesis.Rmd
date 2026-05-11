@@ -1,0 +1,187 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-09-28"
+---
+
+```{r}
+# Packages
+library(kableExtra)
+library(scales)
+library(ggthemes)
+library(tictoc)
+library(tidyverse)
+
+confounders <- c("age", "sex","square root of age", "country","education","age squared","region (6 levels)", "smoking ever", "income (tertiles)", "children (y/n)", "education (as restricted splines", "hypertension", "lipid disorder", "diabetes","smoking", "hypercholesterolaemia", "BMI", "physical activity", "depression", "self-perceived health", "having a job", "hospital stay in the last 12 months", "increased value of cholesterol", "intake of cardiovascular drugs", "chronic diseases") # check if some things are not the same (like cholesterol)
+
+outcomes <- c("Ph006d1, ph006d4: Heart attack / stroke ever", "Ph009_1, ph009_4: 
+Age at heart attack / stroke", "Ph067_1, ph067_2 / ph072_1, ph072_2: 
+Heart attack / stroke since last interview", "Xt011_: Main cause of death heart attack / stroke")
+
+exposure <- c("never married", "cohabiting married") # check other variables
+
+library(specr)
+tic()
+results_specr <- run_specs(
+  df = dat,
+  y = c("y1", "y2"),
+  x = c("x1", "x2"),
+  model = c("lm", "glm"),
+  controls = c("c1", "c2"),
+  subsets = list(group = unique(dat$group))
+)
+toc()
+
+?run_specs
+```
+
+```{r}
+library(dagitty)
+library(ggdag)
+library(ggplot2)
+
+g <- dagify(
+X1 ~ Y,
+X12 ~ Y,
+X123 ~ Y,
+X1234 ~ Y,
+X2 ~ Y,
+X23 ~ Y,
+X234 ~ Y, 
+X3~ Y ,
+X34~ Y ,
+X4 ~ Y,
+
+C1X1 ~ X1,
+C1X12 ~ X12,
+C1X123 ~ X123,
+C1X1234 ~ X1234,
+C1X2 ~ X2,
+C1X23 ~ X23,
+C1X234 ~ X234,
+C1X3 ~ X3,
+C1X34 ~ X34,
+C1X4 ~ X4,
+
+C2X1 ~ X1,
+C2X12 ~ X12,
+C2X123 ~ X123,
+C2X1234 ~ X1234,
+C2X2 ~ X2,
+C2X23 ~ X23,
+C2X234 ~ X234,
+C2X3 ~ X3,
+C2X34 ~ X34,
+C2X4 ~ X4,
+
+  exposure = "Y",
+
+coords = list(
+     x = c(
+       X1 = -2,
+       X12 = -1.5,
+       X123 = -1, 
+       X1234 = -0.5,
+       X2 = 0,
+       Y = 0.5,
+       X23 = 0.5,
+       X234 = 1,
+       X3 = 1.5,
+       X34 = 2,
+       X4 = 2.5, 
+       
+C1X1 = -2.25,
+C1X12 =-1.75,
+C1X123 =-1.25,
+C1X1234 =-0.75,
+C1X2 = - 0.25,
+C1X23 = 0.25,
+C1X234 =0.75,
+C1X3 =1.25,
+C1X34 = 1.75,
+C1X4 = 2.25,
+
+C2X1 = -2,
+C2X12 =-1.5,
+C2X123 =-1,
+C2X1234 =-0.5,
+C2X2 =  0,
+C2X23 = 0.5,
+C2X234 =1,
+C2X3 =1.5,
+C2X34 = 2,
+C2X4 = 2.5),
+
+     y = c(
+       X1 = 0,
+       X12 = 0,
+       X123 = 0, 
+       X1234 = 0,
+       X2 = 0,
+       Y = 1,
+       X23 = 0,
+       X234 = 0,
+       X3 = 0,
+       X34 = 0,
+       X4 = 0, 
+       
+       C1X1 = -1,
+C1X12 = -1,
+C1X123 = -1,
+C1X1234 = -1,
+C1X2 = -1,
+C1X23 = -1,
+C1X234 = -1,
+C1X3 = -1,
+C1X34 = -1,
+C1X4 = -1,
+
+C2X1 = -1,
+C2X12 = -1,
+C2X123 = -1,
+C2X1234 = -1,
+C2X2 = -1,
+C2X23 = -1,
+C2X234 = -1,
+C2X3 = -1,
+C2X34 = -1,
+C2X4 = -1)))
+
+ggdag_status(g) + theme_dag()
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Example: generate all combinations of choices
+df <- expand.grid(
+  outcome = c("O1",
+              "O2",
+              "O3",
+              "O4"),
+  model   = c("COX", "LOG", "LOG-B", "ME-LOG", "DT-ME", "GEE"),
+  covars  = c("NONE", "AGE", "SEX", "CTR", "EDU", "SMOK", "PHYS", 
+              "AGE+SEX", "AGE+CTR", "AGE+EDU", "AGE+SMOK", "AGE+PHYS")
+)
+
+# reshape to long form for plotting
+decisions <- df %>% 
+  mutate(spec_id = row_number()) %>%
+  pivot_longer(-spec_id, names_to = "decision", values_to = "choice")
+
+library(ggalluvial)
+
+decisionplot <- ggplot(df,
+       aes(axis1 = outcome, axis2 = model, axis3 = covars)) +
+  geom_alluvium(aes(fill = outcome), knot.pos = 0.3, alpha = .6) +
+  geom_stratum() +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Outcome", "Model", "Covariates")) +
+  theme_minimal() + ylab("Number of possible decisions")
+
+decisionplot
+```
+
+

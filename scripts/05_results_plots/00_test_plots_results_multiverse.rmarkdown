@@ -1,0 +1,951 @@
+---
+title: "First Density Plots Results Multiverse"
+date: today
+format: pdf
+---
+
+#### SETUP ####
+```{r}
+# Load required packages
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+library(specr)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(kSamples)
+```
+
+```{r}
+# Load data
+df_small <- readRDS(here("data/results/all_models_final_results_1920_2026-04-15.RDS"))
+df_large <- readRDS(here("data/results/corrected_results_final_2026-04-28.RDS"))
+
+# Create color gradient function
+gradient <- colorRampPalette(c("#D55E00", "#56B4E9"))
+```
+
+#### NAs ####
+```{r}
+# Replace Inf and 0.000 by NA
+# as both indicate model non-convergence
+df_large <- df_large %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+
+# How many NAs?
+df_large %>%
+  summarise(na_count = sum(is.na(RR)))
+
+# How are NAs distributed per decision?
+df_large %>%
+  group_by(model_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(data_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(outcome_label) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(exclusion) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(missing_data) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large <- df_large |>
+  filter(!is.na(RR))
+```
+
+#### OUTCOME PLOT #### 
+```{r}
+#### OUTCOME #### 
+OUT_colours <- gradient(length(unique(df_large$outcome_label)))
+
+OUT <- ggplot(df_large, aes(x = RR, colour = outcome_label)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(OUT_colours, 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Outcome") + theme(legend.position="none")
+
+OUT
+```
+
+#### DATA TYPE PLOT #### 
+```{r}
+#### DATA TYPE #### 
+DT_colours <- gradient(length(unique(df_large$data_type)))
+
+DT <- ggplot(df_large, aes(x = RR, colour = data_type)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(DT_colours, 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Data Type") + theme(legend.position="none")
+
+DT
+```
+
+#### EXCLUSION PLOT #### 
+```{r}
+#### EXCLUSION #### 
+EC_colours <- gradient(length(unique(df_large$exclusion)))
+
+EC <- ggplot(df_large, aes(x = RR, colour = exclusion)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(EC_colours, 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Exclusion") + theme(legend.position="none")
+
+EC
+```
+
+#### MISSING DATA PLOT #### 
+```{r}
+#### MISSING DATA #### 
+MD_colours <- gradient(length(unique(df_large$missing_data)))
+
+MD <- ggplot(df_large, aes(x = RR, colour = missing_data)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(MD_colours, 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Missing Data") + theme(legend.position="none")
+
+MD
+```
+
+#### MODEL TYPE PLOT #### 
+```{r}
+#### MODEL TYPE #### 
+SM_colours <- gradient(length(unique(df_large$model_type)))
+
+SM <- ggplot(df_large, aes(x = RR, colour = model_type)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(SM_colours, 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Statistical Model", caption = "Flat orange density is Cox PH, grey peaked density (most left) is log-binomial.") + theme(legend.position="none")
+
+SM
+```
+
+#### ADJUSTMENT LABEL PLOT #### 
+```{r}
+#### ADJUSTMENT LABEL #### 
+ADJ_colours <- gradient(length(unique(df_large$adjustment_label)))
+
+ADJ <- ggplot(df_large, aes(x = RR, colour = adjustment_label)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(ADJ_colours, 0.6)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Adjustment Set", caption = "All orange densities include age as a confounder, all blue densities do not.") + theme(legend.position="none")
+
+ADJ
+
+# Create binary indicators for each confounder
+df_adj <- df_large %>%
+  mutate(
+    has_none = grepl("none", adjustment_label, ignore.case = TRUE),
+    has_age = grepl("age_int", adjustment_label, ignore.case = TRUE),
+    has_sex = grepl("dn042_", adjustment_label, ignore.case = TRUE),
+    has_country = grepl("country", adjustment_label, ignore.case = TRUE),
+    has_smoking = grepl("br001_", adjustment_label, ignore.case = TRUE),
+    has_education = grepl("dn010_", adjustment_label, ignore.case = TRUE),
+    has_activity = grepl("phactiv", adjustment_label, ignore.case = TRUE)
+  )
+
+# Plot density for each confounder
+dens_per_confounder <- df_adj %>%
+  pivot_longer(
+    cols = starts_with("has_"),
+    names_to = "confounder",
+    values_to = "included"
+  ) %>%
+  mutate(confounder = gsub("has_", "", confounder) %>% str_to_title()) %>%
+  ggplot(aes(x = RR, colour = included)) +
+  geom_density(alpha = 0.5) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  facet_wrap(~ confounder, ncol = 3) +
+  scale_colour_manual(
+    name = "Confounder",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Included", "FALSE" = "Excluded")
+  ) +
+  labs(x = "RR", y = "Density", title = "Density plots of RR per adjustment variable",
+    subtitle = "Each panel shows densities when including/excluding a specific adjustment variable",
+    caption = "Note: Dashed line indicates RR = 1") +
+  theme_minimal() +
+  theme(legend.position = "bottom") + theme(
+      plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+      plot.subtitle = element_text(size = 14, hjust = 0.5),
+      plot.caption = element_text(size = 11, hjust = 0)
+    )
+
+ECDF_per_confounder <- df_adj %>%
+  pivot_longer(
+    cols = starts_with("has_"),
+    names_to = "confounder",
+    values_to = "included"
+  ) %>%
+  mutate(confounder = gsub("has_", "", confounder) %>% str_to_title()) %>%
+  ggplot(aes(x = RR, colour = included)) +
+  stat_ecdf(linewidth = 0.8) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  facet_wrap(~ confounder, ncol = 3) +
+  scale_colour_manual(
+    name = "Confounder",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Included", "FALSE" = "Excluded")
+  ) +
+  labs(x = "RR", y = "Density", title = "Empirical cumulative distribution functions (ECDF) of RRs per adjustment variable", subtitle = "Each panel shows ECDFs when including/excluding a specific adjustment variable") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### DENSITY GRID PLOT ###
+```{r}
+DensityGridPlot <- (DT | EC) / (MD | OUT) / (ADJ | SM) +
+  plot_annotation(
+    title = "Density plots of RR per analytical decision",
+    subtitle = "Each panel shows densities across options of a specific decision",
+    caption = "Note: Dashed line indicates RR = 1",
+    theme = theme(
+       plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+      plot.subtitle = element_text(size = 14, hjust = 0.5),
+      plot.caption = element_text(size = 11, hjust = 0)
+    )
+  )
+```
+
+### ECDF GRID PLOT ###
+```{r}
+DT_ECDF <- ggplot(df_large, aes(x = RR, colour = data_type)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(DT_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Data Type") + theme(legend.position = "none")
+
+EC_ECDF <- ggplot(df_large, aes(x = RR, colour = exclusion)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(EC_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Exclusion") + theme(legend.position = "none")
+
+MD_ECDF <- ggplot(df_large, aes(x = RR, colour = missing_data)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(MD_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Missing Data") + theme(legend.position = "none")
+
+OUT_ECDF <- ggplot(df_large, aes(x = RR, colour = outcome_label)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(OUT_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Outcome") + theme(legend.position = "none")
+
+ADJ_ECDF <- ggplot(df_large, aes(x = RR, colour = adjustment_label)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(ADJ_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Adjustment Set", caption = "All orange PDFs include age as a confounder, all blue PDFs do not.") + theme(legend.position = "none")
+
+SM_ECDF <- ggplot(df_large, aes(x = RR, colour = model_type)) +
+  stat_ecdf(linewidth = 0.8) +
+  theme_minimal() +   scale_colour_manual(values = alpha(SM_colours, 0.7)) +
+  labs(x = "RR", y = "Cumulative probability", title = "Statistical Model", caption = "Most left (grey) is log-binom, most right (orange) is Cox PH.") + theme(legend.position = "none")
+
+
+ECDFplot <- (DT_ECDF | EC_ECDF) / (MD_ECDF | OUT_ECDF) / (ADJ_ECDF | SM_ECDF) +
+  plot_annotation(
+    title = "Empirical cumulative distribution functions (ECDF) of RRs per analytical decision",
+    subtitle = "Each panel shows ECDFs across decision options",
+    theme = theme(
+      plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+      plot.subtitle = element_text(size = 14, hjust = 0.5),
+      plot.caption = element_text(size = 11, hjust = 0)
+    )
+  )
+
+ECDFplot
+```
+
+##### VIOLIN ETC ####
+```{r}
+# Violin plots outcome
+OUT_vio <- ggplot(df_plot, aes(x = outcome_label, y = RR, fill = outcome_label)) +
+  geom_violin(alpha=0.3) +
+  geom_boxplot(width = 0.1) +
+  coord_flip() + theme_minimal() + theme(legend.position = "none")
+
+# Violin plots data_type
+DT_vio <- ggplot(df_plot, aes(x = data_type, y = RR, fill = data_type)) +
+  geom_violin(alpha=0.3) +
+  geom_boxplot(width = 0.1) +
+  coord_flip() + theme_minimal() + theme(legend.position = "none")
+
+# Violin plots missing_data
+MD_vio <- ggplot(df_plot, aes(x = missing_data, y = RR, fill = missing_data)) +
+  geom_violin(alpha=0.3) +
+  geom_boxplot(width = 0.1) +
+  coord_flip() + theme_minimal() + theme(legend.position = "none")
+
+# Violin plots exclusion
+EC_vio <- ggplot(df_plot, aes(x = exclusion, y = RR, fill = exclusion)) +
+  geom_violin(alpha=0.3) +
+  geom_boxplot(width = 0.1) +
+  coord_flip() + theme_minimal() + theme(legend.position = "none")
+
+# Violin plots adjustment_label all 
+#ggplot(df_plot, aes(x = adjustment_label, y = RR, fill = adjustment_label)) +
+#  geom_violin(alpha=0.3) +
+#  geom_boxplot(width = 0.1) +
+#  coord_flip() + theme_minimal() + theme(legend.position = "none")
+
+# Violin plots adjustment_label per confounder (in/excluded) 
+ADJ_vio <- df_adj %>%
+  pivot_longer(
+    cols = starts_with("has_"),
+    names_to = "confounder",
+    values_to = "included"
+  ) %>%
+  mutate(confounder = gsub("has_", "", confounder) %>% str_to_title()) %>%
+  ggplot(aes(x = confounder, y = RR, fill = included)) +
+  geom_violin(alpha = 0.3, position = position_dodge(0.9)) +
+  geom_boxplot(width = 0.1, position = position_dodge(0.9)) +
+  coord_flip() + 
+  scale_fill_manual(
+    values = c("TRUE" = "#1b9e77", "FALSE" = "#d95f02"),
+    labels = c("TRUE" = "Included", "FALSE" = "Excluded")
+  ) +
+  theme_minimal() +
+  labs(fill = "Confounder") + theme(legend.position = "none")
+
+
+# Violin plots model_type
+SM_vio <- ggplot(df_plot, aes(x = model_type, y = RR, fill = model_type)) +
+  geom_violin(alpha=0.3) +
+  geom_boxplot(width = 0.1) +
+  coord_flip() + theme_minimal() + theme(legend.position = "none")
+```
+
+### SPECIFICATION CURVE CLEANER WITH CI ###
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(cowplot)
+library(stringr)
+
+df_plot <- df_large %>%
+  filter(!is.na(RR)) %>%
+  arrange(RR) %>%
+  mutate(
+    spec_id = row_number(),
+    significant = p.value < 0.05,
+    adjustment_label = adjustment_label %>%
+      str_replace_all("dn010_", "edu") %>%
+      str_replace_all("dn042_", "sex") %>%
+      str_replace_all("br001_", "smok") %>%
+      str_replace_all("phactiv", "phys") %>%
+      str_replace_all("country", "coun") %>%
+      str_replace_all("age_int", "age") %>%
+      str_replace_all("none", "none")
+  )
+
+choice_labels <- c(
+  "data_type" = "Data Type",
+  "missing_data" = "Missing Data",
+  "exclusion" = "Exclusion",
+  "outcome_label" = "Outcome",
+  "model_type" = "Model",
+  "adjustment_label" = "Adjustment Set"
+)
+
+# Set common x limits
+x_limits <- c(0, max(df_plot$spec_id))
+
+# Top panel: estimates with CIs
+p_top <- ggplot(df_plot, aes(x = spec_id, y = RR, colour = significant)) +
+  geom_linerange(
+    aes(ymin = conf.low, ymax = conf.high),
+    linewidth = 0.1, alpha = 0.1
+  ) +
+  geom_point(aes(color = significant),
+               size = 0.5) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "black", linewidth = 0.3) +
+  scale_colour_manual(
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    guide = "none"
+  ) +
+  scale_y_continuous(expand = c(0.02, 0)) +
+  scale_x_continuous(expand = c(0.01, 0)) +
+  theme_minimal()+
+  theme(strip.text = element_blank(),
+          axis.line = element_line("black", size = .3),
+          legend.position = "none",
+          panel.spacing = unit(1, "lines"),
+          axis.text = element_text(colour = "black")) +
+  labs(y = "Relative Risk", x = NULL)
+
+# Bottom panel: specification grid
+p_bottom <- df_plot %>%
+  select(spec_id, data_type, missing_data, exclusion, outcome_label, model_type, adjustment_label, significant) %>%
+  pivot_longer(
+    cols = c(data_type, missing_data, exclusion, outcome_label, model_type, adjustment_label),
+    names_to = "choice", 
+    values_to = "value"
+  ) %>%
+  ggplot(aes(x = spec_id, y = value, colour = significant)) +
+  geom_point(shape = 124,
+               size = 2, alpha = 0.8) +
+  scale_colour_manual(
+    name = "p < 0.05",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Yes", "FALSE" = "No")
+  ) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(choice ~ ., scales = "free_y", space = "free_y", switch = "y", 
+             labeller = labeller(choice = choice_labels)) +
+  theme_minimal() +
+  theme(
+    axis.line = element_line("black", size = .5),
+    panel.spacing = unit(.75, "lines"),
+    axis.text = element_text(colour = "black"),
+    axis.text.y = element_text(size = 8),
+    strip.text.y.left = element_text(angle = 0, hjust = 1, size = 10),
+    strip.placement = "outside",
+    plot.margin = margin(0, 10, 5, 10)
+  ) +
+  labs(x = "Specification", y = NULL)
+
+# Combine
+#plot_grid(p_top, p_bottom, ncol = 1, align = "v", axis = "lr", rel_heights = c(1, 5))
+```
+
+### FINAL SPECIFICATION CURVE CLEANER WITHOUT CI ###
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(cowplot)
+library(stringr)
+
+df_plot <- df_large %>%
+  filter(!is.na(RR)) %>%
+  arrange(RR) %>%
+  mutate(
+    spec_id = row_number(),
+    significant = p.value < 0.05,
+    
+    # Adjustment labels
+    adjustment_label = adjustment_label %>%
+      str_replace_all("dn010_", "E") %>%
+      str_replace_all("dn042_", "Se") %>%
+      str_replace_all("br001_", "Sm") %>%
+      str_replace_all("phactiv", "P") %>%
+      str_replace_all("country", "C") %>%
+      str_replace_all("age_int", "A") %>%
+      str_replace_all("none", "N"),
+    
+    # Outcome labels
+    outcome_label = outcome_label %>%
+      str_replace_all("age_at_event", "Age") %>%
+      str_replace_all("event_ever", "Ever") %>%
+      str_replace_all("death_by_event", "Death") %>%
+      str_replace_all("since_last_int", "Since"),
+    
+    # Data type labels
+    data_type = data_type %>%
+      str_replace_all("cross_all", "Cross-sectional (all)") %>%
+      str_replace_all("cross_w1", "Cross-sectional (W1)") %>%
+      str_replace_all("long_nostrict", "Longitudinal (no strict baseline)") %>%
+      str_replace_all("long_w1", "Longitudinal (W1)"),
+    
+    # Missing data labels
+    missing_data = missing_data %>%
+      str_replace_all("cc", "Complete cases") %>%
+      str_replace_all("ni", "No information"),
+    
+    # Exclusion labels
+    exclusion = exclusion %>%
+      str_replace_all("born_after1954", "Born after 1954") %>%
+      str_replace_all("younger_than_55_w1", "Younger than 55") %>%
+      str_replace_all("married_before18", "Married before 18") %>%
+      str_replace_all("divorced_widowed", "Divorced/widowed") %>%
+      str_replace_all("country", "Country") %>%
+      str_replace_all("none", "None"),
+    
+    # Model type labels
+    model_type = model_type %>%
+      str_replace_all("cox_haz", "Cox PH") %>%
+      str_replace_all("mix_log_reg", "Mixed logistic") %>%
+      str_replace_all("log_reg", "Logistic") %>%
+      str_replace_all("log-binom", "Log-binomial") %>%
+      str_replace_all("time_mix", "Discrete-time mixed") %>%
+      str_replace_all("GEE", "GEE")
+  )
+
+choice_labels <- c(
+  "data_type" = "Data Type",
+  "missing_data" = "Missing Data",
+  "exclusion" = "Exclusion",
+  "outcome_label" = "Outcome",
+  "model_type" = "Statistical Model",
+  "adjustment_label" = "Adjustment Set"
+)
+
+# Set common x limits
+x_limits <- c(0, max(df_plot$spec_id))
+
+# Top panel: estimates with CIs
+p_top <- ggplot(df_plot, aes(x = spec_id, y = RR, colour = significant)) +
+  geom_point(aes(color = significant),
+               size = 0.5) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "black", linewidth = 0.3) +
+  scale_colour_manual(
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    guide = "none"
+  ) +
+  scale_y_continuous(expand = c(0.02, 0)) +
+  scale_x_continuous(expand = c(0.01, 0)) +
+  theme_minimal()+
+  theme(strip.text = element_blank(),
+          axis.line = element_line("black", size = .3),
+          legend.position = "none",
+          panel.spacing = unit(1, "lines"),
+          axis.text = element_text(colour = "black")) +
+  labs(y = "Risk Ratio", x = NULL)
+
+# Bottom panel: specification grid
+p_bottom <- df_plot %>%
+  select(spec_id, data_type, missing_data, exclusion, outcome_label, model_type, adjustment_label, significant) %>%
+  pivot_longer( 
+    cols = c(data_type, missing_data, exclusion, outcome_label, model_type, adjustment_label),
+    names_to = "choice", 
+    values_to = "value"
+  ) %>%
+  ggplot(aes(x = spec_id, y = value, colour = significant)) +
+  geom_point(shape = 124,
+               size = 2, alpha = 0.8) +
+  scale_colour_manual(
+    name = "p < 0.05",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Yes", "FALSE" = "No")
+  ) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(choice ~ ., scales = "free_y", space = "free_y", switch = "y", 
+             labeller = labeller(choice = choice_labels)) +
+  theme_minimal() +
+  theme(
+    axis.line = element_line("black", size = .5),
+    panel.spacing = unit(.75, "lines"),
+    axis.text = element_text(colour = "black"),
+    axis.text.y = element_text(size = 7),
+    strip.text.y.left = element_text(angle = 90, hjust = 1, size = 11),
+    strip.placement = "outside",
+    plot.margin = margin(0, 10, 5, 10)
+  ) +
+  labs(x = "Specification", y = NULL)
+
+# Combine
+specPlot <- plot_grid(p_top, p_bottom, ncol = 1, align = "v", axis = "lr", rel_heights = c(1, 5))
+```
+
+
+## TEST SPEC CLEANER
+```{r}
+# ---- 1. Prep adjustment dot matrix ----
+confounders <- c("Age", "Sex", "Smoking", "Education", "Country", "Physical activity")
+
+df_adj_long <- df_plot %>%
+  select(spec_id, adjustment_label, significant) %>%
+  mutate(
+    Age                 = str_detect(adjustment_label, regex("age", ignore_case = TRUE)),
+    Country             = str_detect(adjustment_label, regex("country", ignore_case = TRUE)),
+    Education           = str_detect(adjustment_label, regex("dn010_", ignore_case = TRUE)),
+    None                = str_detect(adjustment_label, regex("none", ignore_case = TRUE)),
+    `Physical activity` = str_detect(adjustment_label, regex("phactiv", ignore_case = TRUE)),
+    Sex                 = str_detect(adjustment_label, regex("dn042_", ignore_case = TRUE)),
+    Smoking             = str_detect(adjustment_label, regex("br001_", ignore_case = TRUE))
+  ) %>%
+  pivot_longer(
+    cols = all_of(confounders),
+    names_to = "confounder",
+    values_to = "included"
+  ) %>%
+  mutate(
+    confounder = factor(confounder, levels = rev(confounders)),
+    panel = "Adjustment Set"
+  )
+
+# ---- 2. Prep outcome dot matrix ----
+outcome_components <- c("Age", "Ever", "Death", "Since")
+
+df_outcome_long <- df_plot %>%
+  select(spec_id, outcome_label, significant) %>%
+  mutate(
+    Age   = str_detect(outcome_label, "Age"),
+    Death = str_detect(outcome_label, "Death"),
+    Ever  = str_detect(outcome_label, "Ever"),
+    Since = str_detect(outcome_label, "Since")
+  ) %>%
+  pivot_longer(
+    cols = all_of(outcome_components),
+    names_to = "component",
+    values_to = "included"
+  ) %>%
+  mutate(
+    component = factor(component, levels = rev(outcome_components)),
+    panel = "Outcome"
+  )
+
+# Replace strip_theme with this
+strip_theme <- theme(
+  axis.line.y = element_line("black", linewidth = 0.5),
+  axis.line.x = element_blank(),
+  axis.text = element_text(colour = "black"),
+  axis.text.x = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.text.y = element_text(size = 8, hjust = 1),
+  strip.text.y.left = element_text(angle = 0, hjust = 1, size = 10),
+  strip.placement = "outside",
+  legend.position = "none",
+  panel.border = element_blank()  # removes box around panels
+)
+
+# ---- 3. Top panel ----
+p_top <- ggplot(df_plot, aes(x = spec_id, y = RR, colour = significant)) +
+  geom_point(size = 0.5) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "black", linewidth = 0.3) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_y_continuous(expand = c(0.02, 0)) +
+  scale_x_continuous(expand = c(0.01, 0)) +
+  theme_minimal() +
+  theme(
+    axis.line = element_line("black", linewidth = 0.3),
+    axis.line.x.top = element_blank(),
+    axis.text = element_text(colour = "black"),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    plot.margin = margin(5, 10, 0, 10)
+  ) +
+  labs(y = "Risk Ratio", x = NULL)
+
+# ---- 4. Middle panel ----
+p_bottom <- df_plot %>%
+  select(spec_id, data_type, missing_data, exclusion, model_type, significant) %>%
+  pivot_longer(
+    cols = c(data_type, missing_data, exclusion, model_type),
+    names_to = "choice", values_to = "value"
+  ) %>%
+  ggplot(aes(x = spec_id, y = value, colour = significant)) +
+  geom_point(shape = 124, size = 2, alpha = 0.8) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(choice ~ ., scales = "free_y", space = "free_y", switch = "y",
+             labeller = labeller(choice = choice_labels)) +
+  theme_minimal() +
+  strip_theme +
+  theme(
+    panel.spacing = unit(0.75, "lines"),
+    plot.margin = margin(0, 10, 0, 10)
+  ) +
+  labs(x = NULL, y = NULL)
+
+# ---- 5. Outcome panel ----
+p_outcome <- ggplot(filter(df_outcome_long, included),
+                    aes(x = spec_id, y = component, colour = significant)) +
+  geom_point(shape = 124, size = 2, alpha = 0.8) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  scale_y_discrete(drop = FALSE) +
+  facet_grid(panel ~ ., switch = "y") +
+  theme_minimal() +
+  strip_theme +
+  theme(plot.margin = margin(0, 10, 0, 10)) +
+  labs(x = NULL, y = NULL)
+
+# ---- 6. Adjustment panel ----
+p_adj <- ggplot(filter(df_adj_long, included),
+                aes(x = spec_id, y = confounder, colour = significant)) +
+  geom_point(shape = 124, size = 2, alpha = 0.8) +
+  scale_colour_manual(
+    name = "p < 0.05",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Yes", "FALSE" = "No")
+  ) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  scale_y_discrete(drop = FALSE) +
+  facet_grid(panel ~ ., switch = "y") +
+  theme_minimal() +
+  strip_theme +  # use shared theme now
+  theme(
+    axis.line.x.bottom = element_line("black", linewidth = 0.5),
+    plot.margin = margin(0, 10, 5, 10),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.title = element_text(size = 9),
+    legend.text = element_text(size = 9)
+  ) +
+  labs(x = "Specification", y = NULL)
+
+# ---- 7. Combine ----
+specPlot <- plot_grid(
+  p_top,
+  p_bottom,
+  p_outcome,
+  p_adj,
+  ncol = 1,
+  align = "v",
+  axis = "lr",
+  rel_heights = c(1.5, 3.5, 0.8, 1.5)
+)
+
+specPlot
+```
+
+
+
+
+
+
+
+
+```{r}
+df_plot <- df_large %>%
+  filter(!is.na(RR)) %>%
+  arrange(RR) %>%
+  mutate(
+    spec_id = row_number(),
+    significant = p.value < 0.05,
+    
+    # Adjustment labels
+    adjustment_label_abbrev = adjustment_label %>%
+      str_replace_all("dn010_", "E") %>%
+      str_replace_all("dn042_", "Se") %>%
+      str_replace_all("br001_", "Sm") %>%
+      str_replace_all("phactiv", "P") %>%
+      str_replace_all("country", "C") %>%
+      str_replace_all("age_int", "A") %>%
+      str_replace_all("none", "N"), 
+    
+        # Outcome labels
+    outcome_label = outcome_label %>%
+      str_replace_all("age_at_event", "Age") %>%
+      str_replace_all("event_ever", "Ever") %>%
+      str_replace_all("death_by_event", "Death") %>%
+      str_replace_all("since_last_int", "Since"),
+    
+    # Data type labels
+    data_type = data_type %>%
+      str_replace_all("cross_all", "Cross-sectional (all)") %>%
+      str_replace_all("cross_w1", "Cross-sectional (W1)") %>%
+      str_replace_all("long_nostrict", "Longitudinal (no strict baseline)") %>%
+      str_replace_all("long_w1", "Longitudinal (W1)"),
+    
+    # Missing data labels
+    missing_data = missing_data %>%
+      str_replace_all("cc", "Complete cases") %>%
+      str_replace_all("ni", "No information"),
+    
+    # Exclusion labels
+    exclusion = exclusion %>%
+      str_replace_all("born_after1954", "Born after 1954") %>%
+      str_replace_all("younger_than_55_w1", "Younger than 55") %>%
+      str_replace_all("married_before18", "Married before 18") %>%
+      str_replace_all("divorced_widowed", "Divorced/widowed") %>%
+      str_replace_all("country", "Country") %>%
+      str_replace_all("none", "None"),
+    
+    # Model type labels
+    model_type = model_type %>%
+      str_replace_all("cox_haz", "Cox PH") %>%
+      str_replace_all("mix_log_reg", "Mixed logistic") %>%
+      str_replace_all("log_reg", "Logistic") %>%
+      str_replace_all("log-binom", "Log-binomial") %>%
+      str_replace_all("time_mix", "Discrete-time mixed") %>%
+      str_replace_all("GEE", "GEE")
+  )
+
+choice_labels <- c(
+  "data_type" = "Data Type",
+  "missing_data" = "Missing Data",
+  "exclusion" = "Exclusion",
+  "outcome_label" = "Outcome",
+  "model_type" = "Statistical Model",
+  "adjustment_label" = "Adjustment Set"
+)
+
+# Top panel
+p_top <- ggplot(df_plot, aes(x = spec_id, y = RR, colour = significant)) +
+  geom_point(size = 0.5) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "black", linewidth = 0.3) +
+  scale_colour_manual(
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    guide = "none"
+  ) +
+  scale_y_continuous(expand = c(0.02, 0)) +
+  scale_x_continuous(expand = c(0.01, 0)) +
+  theme_minimal() +
+  theme(
+    strip.text = element_blank(),
+    axis.line = element_line("black", linewidth = 0.3),
+    legend.position = "none",
+    panel.spacing = unit(1, "lines"),
+    axis.text = element_text(colour = "black"),
+    plot.margin = margin(5, 10, 0, 10)
+  ) +
+  labs(y = "Risk Ratio", x = NULL)
+
+# Bottom panel
+p_bottom <- df_plot %>%
+  select(spec_id, data_type, missing_data, exclusion, outcome_label, 
+         model_type, adjustment_label_abbrev, significant) %>%
+  pivot_longer(
+    cols = c(data_type, missing_data, exclusion, outcome_label, 
+             model_type, adjustment_label_abbrev),
+    names_to = "choice",
+    values_to = "value"
+  ) %>%
+  mutate(choice = recode(choice, adjustment_label_abbrev = "adjustment_label")) %>%
+  ggplot(aes(x = spec_id, y = value, colour = significant)) +
+  geom_point(shape = 124, size = 2, alpha = 0.8) +
+  scale_colour_manual(
+    name = "p < 0.05",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Yes", "FALSE" = "No")
+  ) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(choice ~ ., scales = "free_y", space = "free_y", switch = "y",
+             labeller = labeller(choice = choice_labels)) +
+  theme_minimal() +
+  theme(
+    axis.line = element_line("black", linewidth = 0.5),
+    panel.spacing = unit(0.75, "lines"),
+    axis.text = element_text(colour = "black"),
+    axis.text.y = element_text(size = 8, hjust = 1),  
+    strip.text.y.left = element_text(angle = 90, hjust = 1, size = 11),
+    strip.placement = "outside",
+    plot.margin = margin(0, 80, 5, 10)  
+  ) +
+  labs(x = "Specification", y = NULL)
+
+# Combine and save
+specPlot <- plot_grid(p_top, p_bottom, ncol = 1, align = "v", 
+                      axis = "lr", rel_heights = c(1.5, 5))
+
+specPlot
+```
+
+
+### SAVE ALL PLOTS ###
+
+```{r}
+# Save final plots
+ggsave(
+   here("docs/Thesis_Draft/density_plot.png"),
+  plot = DensityGridPlot,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = FALSE
+)
+
+ggsave(
+   here("docs/Thesis_Draft/ECDF_plot.png"),
+  plot = ECDFplot,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = FALSE
+)
+
+ggsave(
+   here("docs/Thesis_Draft/ECDF_per_confounder.png"),
+  plot = ECDF_per_confounder,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = FALSE
+)
+
+ggsave(
+   here("docs/Thesis_Draft/dens_per_confounder.png"),
+  plot = dens_per_confounder,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = FALSE
+)
+
+
+ggsave(
+  here("docs/Thesis_Draft/specification_curve.pdf"),
+  plot = specPlot,
+  width = 13,    
+  height = 14,  
+  units = "in"
+)
+
+ggsave(
+   here("docs/Thesis_Draft/specification_curve.png"),
+  plot = specPlot,
+  width = 11,
+  height = 16,
+  dpi = 300,
+  limitsize = FALSE
+)
+```
+
+```{r}
+# AGE DIFFERENCE BETWEEN GROUPS?
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+w1 <- readRDS(here("data/cleandata/w1_clean.RDS"))
+
+source(here("scripts/04_set_up_multiverse/01_data_type_function.R"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+
+df_CA <- df_type_function(df,"cross_all", w1)
+df_CW1 <- df_type_function(df,"cross_w1", w1)
+df_LNS <- df_type_function(df,"long_nostrict", w1)
+df_LW1 <- df_type_function(df,"long_w1", w1)
+
+df_CA <- exposure_function(df_CA)
+df_CW1 <- exposure_function(df_CW1)
+df_LNS <- exposure_function(df_LNS)
+df_LW1 <- exposure_function(df_LW1)
+
+df_CA |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            DT = "cross_all")
+
+df_CW1 |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            DT = "cross_w1")
+
+df_LNS |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            DT = "long_nostrict")
+
+df_LW1 |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            DT = "long_w1")
+
+
+write_rds(df_CA, here("data/DataTypeDfs/df_CA.RDS"))
+write_rds(df_CW1, here("data/DataTypeDfs/df_CW1.RDS"))
+write_rds(df_LNS, here("data/DataTypeDfs/df_LNS.RDS"))
+write_rds(df_LW1, here("data/DataTypeDfs/df_LW1.RDS"))
+```
+
+
+
+
+
+
+

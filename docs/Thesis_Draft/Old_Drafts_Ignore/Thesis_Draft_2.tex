@@ -1,0 +1,845 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{ragged2e}
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Thesis Draft 2},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Thesis Draft 2}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+
+
+\section{Introduction}\label{introduction}
+
+Over recent years, it has become increasingly clear that the scientific
+community is facing a replication crisis (e.g., Forbes, Travers, and
+Johnson 2023). A growing number of studies have reported difficulties
+reproducing previously published findings. This problem is often
+attributed to publication bias -- the tendency to only publish
+significant results -- and questionable research practices (QRPs).
+However, even studies aimed at removing the incentive for QRPs have
+painted a rather pessimistic picture of reproducible science (Auspurg
+and Brüderl 2024). Many-analyst studies, where multiple independent
+researchers answer the same research question using the same dataset,
+have shown considerable variation in analytic strategies and results
+(e.g., Silberzahn et al. 2018; Bastiaansen et al. 2020; Breznau et al.
+2022; Hoogeveen et al. 2023a; Gould et al. 2025; Kowall et al. 2025).
+Reported effect sizes often vary from negative to positive, and from
+significant to non-significant, all within the same study. This means
+that there is not only considerable variation in the results but also in
+the substantive conclusions drawn from them. At first glance, this seems
+an immediate threat to the reproducibility of science. In an ideal
+world, one might expect that a single dataset should yield a single,
+`true' answer, raising the question whether effect size variation should
+always be interpreted as problematic.
+
+However, interpreting this variation without understanding its origins
+may not be that straightforward. A frequently raised criticism of
+many-analyst projects is that the posed research questions are often too
+vague, leaving analysts uncertain about how to proceed with data
+analysis and which variables should be included in their statistical
+models (Kummerfeld and Jones 2023; Hoogeveen et al. 2023b).
+
+\texttt{For\ example,\ @silberzahn\_many\_2018\ asked\ analysts\ to\ investigate\ the\ effect\ of\ skin\ tone\ of\ soccer\ players\ on\ the\ likelihood\ to\ receive\ a\ red\ card.\ This\ question\ can\ be\ interpreted\ different\ ways;\ are\ we\ interested\ in\ a\ descirptive\ association\ between\ skin\ tone\ and\ the\ likelihood\ of\ receiving\ a\ red\ card,\ or\ are\ we\ interested\ in\ a\ causal\ effect\ of\ skin\ tone\ on\ this\ likelihood?\ Depending\ on\ these\ different\ causal\ effects,\ different\ variables\ need\ to\ be\ included\ in\ the\ model.}
+
+\emph{researchers may choose to identify different causal effects, each
+of which has its merit, but each of which implies different estimands
+and corresponding identification strategies (reasonable counterfactuals;
+15, 36). For example, one might be interested in (i) identifying the
+descriptive difference in the probability of receiving a red card by
+skin color, or one might be interested in (ii) identifying the causal
+direct effect of skin color (``racial bias'').}
+
+This uncertainty is particularly problematic in situations where
+researchers are implicitly interested in finding causal relationships,
+which is often the case in many-analyst projects (Del Giudice and
+Gangestad 2021; Bulbulia 2023; Rohrer, Smith, and Munafò 2025). In this
+context, including different confounders may correspond to different
+causal assumptions and thus different -- potentially opposing --
+estimated effects. Therefore, when analysts select different variables,
+they may in fact be answering different questions (Simonsohn, Simmons,
+and Nelson 2015). From this perspective, effect size variation may
+indicate meaningful substantive differences rather than problematic
+analytical noise. On the other hand, if the effect size variation stems
+from arbitrary, equally justifiable decisions whose options do not
+reflect different substantive meanings, this may be considered more
+problematic (Del Giudice and Gangestad 2021).
+
+\subsubsection{The AB-framework}\label{the-ab-framework}
+
+For better interpretation of effect size variation in many-analyst
+projects, Auspurg and Brüderl (2024) have introduced a theoretical
+framework (hereafter referred to as the AB-framework) to distinguish
+between three different sources of variation, two of which are
+considered `harmful' and one `helpful' (see
+Table\textasciitilde{}\ref{tab:AB_framework}).
+
+\begin{table}[H]
+\centering
+\caption{Sources of variation}
+\label{tab:AB_framework}
+\begin{threeparttable}
+\footnotesize
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{tabular}{
+>{\RaggedRight\arraybackslash}p{7.2cm}
+>{\RaggedRight\arraybackslash}p{7.2cm}
+}
+\toprule
+\textbf{Harmful} & \textbf{Helpful} \\
+\midrule
+
+(a) Model uncertainty, including subjective analytical choices in data handling (e.g., missing data decisions, weighting etc.) and the selection of statistical models with different assumptions
+
+\vspace{0.4em}
+(b) Coding errors
+&
+(c) Substantively meaningful variation arising from different definitions of dependent, independent, and confounding variables, as well as differences in target populations (e.g., exclusion criteria or changes over time) \\
+
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{table}
+
+First, effect size variation may arise from model uncertainty (a), for
+example in missing-data handling or modelling assumptions, reflecting
+ambiguity about the correct approach to estimate the parameter of
+interest and its underlying data-generating process. For example, if
+different missing data handling strategies (e.g., listwise deletion
+versus multiple imputation) result in different mean effect sizes, while
+the underlying observed data remain the same, this would imply that the
+outcome depends on an arbitrary analytic choice rather than on the data
+themselves. Secondly, effect size variation may be the result of
+sloppiness or hidden coding errors (b) made by the analysts. Both
+sources can be considered harmful, as they can introduce undesirable
+uncertainty into scientific analyses, making conclusions less credible.
+
+In contrast, the third source concerns analytical choices that provide
+information about substantive variation that actually exists in the
+population (c). As mentioned earlier, selecting different target
+populations or confounders can lead to slightly different questions
+being answered. For example, if analyst X uses the full dataset, while
+analyst Y analyses only the men in that same dataset, X might find no
+effect in the general population, while Y finds that there is a
+male-specific positive effect. Given that the two analysts answered
+different questions, this source can be considered as helpful for the
+advancement of theories. By taking a closer look at the decisions made
+by analysts and the implications thereof, the AB-framework provides
+tools to interpret effect size variation in many-analyst projects.
+
+\subsubsection{Identifying sources of variation in many-analyst
+projects}\label{identifying-sources-of-variation-in-many-analyst-projects}
+
+Although several many-analyst studies have aimed to identify the sources
+of effect size variation, so far no consensus has been reached (e.g.,
+Silberzahn et al. 2018; Bastiaansen et al. 2020; Breznau et al. 2022;
+Hoogeveen et al. 2023a; Gould et al. 2025; Kowall et al. 2025). For
+example, Hoogeveen et al. (2023a) found that the operationalisations of
+variables, rather than model choice, influenced the results the most. In
+contrast, Gould et al. (2025) showed that neither variation in variable
+selection nor model structure meaningfully predicted variability, but
+did not explicitly name another explanation source of variation. A
+similar pattern was found by Kowall et al. (2025), where data structure
+(cross-sectional versus longitudinal), rather than model or variable
+choice, likely had the largest impact on the results. Different studies
+thus highlight different sources of variation.
+
+Given the wide variety of topics, designs, and variables across
+projects, it may be unrealistic to expect a single, fixed set of
+explanatory factors that applies to all studies. However, even
+identifying a study-specific source of variation might not be possible
+based on many-analyst studies alone. A key limitation of these projects
+is that the involved analysts make decisions in an uncontrolled way
+(Kummerfeld and Jones 2023). This leads to the problem of sparse data,
+where little data is generally available for each individual decision,
+as unique combinations of choices are often chosen only once. This
+sparsity makes it difficult to properly disentangle individual sources
+of variation and provide systematic quantitative evidence of their
+relative influence. Consequently, solely looking at analytical decisions
+in many-analyst projects may not provide enough information to interpret
+effect size variation with the AB-framework.
+
+\subsubsection{Multiverse analysis}\label{multiverse-analysis}
+
+One approach to addressing the problem of data sparseness is multiverse
+analysis (e.g., Steegen et al. 2016; Hoogeveen et al. 2023b). First,
+this method identifies all reasonable decisions, each with a specific
+number of options, and systematically combines them into a decision
+space (Liu, Althoff, and Heer 2023). Since not all combinations may
+yield possible analyses, the set of valid analysis paths (universes) is
+always smaller than or equal to the full product. Then, results are
+reported across all valid universes. This way, multiverse analysis
+allows for the exploration of the entire decision space, rather than
+just a subset of choices made by analysts. As a result, substantially
+more data are available for each decision, enabling quantification of
+their specific impact on the results.
+
+Although multiverse analysis seems a promising way of systematically
+evaluating the sensitivity of decisions, one of its limitations is that
+the decision space is often defined by a single researcher (Simonsohn,
+Simmons, and Nelson 2015). Consequently, some reasonable analysis paths
+may be overlooked. However, by basing the multiverse analysis on an
+existing many-analyst project, this problem can be solved. The decision
+space will then be determined by the '\,'wisdom of the crowd'' and
+represent realistic research choices (Auspurg and Brüderl 2024).
+
+Another limitation is that different universes with contradicting
+substantial implications may be included within the same multiverse. Del
+Giudice and Gangestad (2021) argue that as a solution, a multiverse
+should only include truly arbitrary, but not theoretically meaningful
+decisions, as the latter may lead to misleading results. However, by
+including both types of decisions and subsequently classifying them with
+the AB-framework, results that might otherwise be considered misleading
+could instead be interpreted in a meaningful way.
+
+\subsubsection{Present study}\label{present-study}
+
+To assess the current state of the replication crisis using many-analyst
+projects, it is highly relevant to identify the most prominent sources
+of variation and their implications based on the AB-framework. Due to
+the descriptive nature of many-analyst studies, no consensus has yet
+been reached about what factors drive variability in the results,
+leading to the research question:
+
+\emph{What is the relative contribution of harmful versus helpful
+analytical decisions in many-analyst projects to effect size variation
+when they are systematically evaluated in a multiverse?}
+
+Aiming to gain quantitative evidence of the relative influence of
+different sources of variation, the present study will conduct a
+multiverse analysis based on the many-analyst project by Kowall et al.
+(2025), where 16 teams analysed whether marital status (cohabiting
+married versus never married) predicts cardiovascular disease. This was
+chosen as a case study, because there was a large variety of both
+harmful and helpful decisions, providing a rich decision space to
+evaluate the impact of a wide range of different decisions. The decision
+space consists of six analytical decisions: handling missing data,
+choice of exclusion criteria, statistical model and definitions of
+dependent variables, confounders and target population. Before running
+the analysis, these decisions are classified as harmful/helpful using
+the AB-framework. The multiverse analysis is largely based on sampling
+and approximation methods proposed by Liu, Althoff, and Heer (2023),
+where the decision space is sampled to immediately calculate the mean
+effect and decision sensitivity. Lastly, a specification curve will be
+plotted to visualise how the outcomes relate to different analysis
+paths. For more details, see the Methods section.
+
+\section{Methods}\label{methods}
+
+\subsubsection{Ethics}\label{ethics}
+
+Ethical approval was granted by the Ethics Review Board of the Faculty
+of Social and Behavioural Sciences of Utrecht University.
+
+\subsubsection{Data}\label{data}
+
+Although the original teams' results are not analysed directly, the
+multiverse is applied to the same data they analysed in Kowall et al.
+(2025), namely the Survey of Health, Ageing and Retirement in Europe
+(SHARE). This is a freely available (after registration) panel study
+conducted in 28 European countries. Consistent with the original study,
+waves 1-7 are used. As some analysts used the imputed SHARE datasets,
+these are also used here.
+
+All variables needed for the construction of the decision space (e.g.,
+dependent, independent, confounders, exclusion) are selected from
+different relevant datasets that are available per wave. Then, one
+cleaned dataset is created per wave, where the selected variables are
+linked through an ID variable.
+
+\begin{table}[htbp]
+\centering
+\caption{Analytical decisions and their options based on the orginal many-analyst study, that were used in the present multiverse analysis.}
+\label{tab:decision_space}
+\begin{threeparttable}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{
+>{\RaggedRight\arraybackslash}p{3.2cm}
+>{\RaggedRight\arraybackslash}p{6.2cm}
+>{\RaggedRight\arraybackslash}X
+}
+\toprule
+\textbf{Decision} & \textbf{Options} & \textbf{Notes / Deviations from original} \\
+\midrule
+\multicolumn{2}{l}{\textbf{Harmful sources of variation}} \\
+\midrule
+Missing data &
+Complete cases (16) \newline
+``No information'' (1)
+&
+For complete cases, listwise deletion is applied. In the original study, analysts occasionally used the imputed dataset provided by SHARE, this was not done in this multiverse analysis. One team replaced missing values in categorical variables by ``no information'' to prevent listwise deletion. \\
+\addlinespace
+Model type &
+Cox proportional hazards model (6) \newline
+Logistic regression (5) \newline
+Log-binomial model (2) \newline
+Mixed-effects logistic regression (1) \newline
+Discrete-time mixed-effects model (1) \newline
+Generalised estimating equations (1)
+&
+Originally, different effect sizes were reported. For comparability, this multiverse analysis reports risk ratios only. \\
+\addlinespace
+\multicolumn{3}{l}{\textbf{Helpful sources of variation}} \\
+\midrule
+Data structure &
+Strictly longitudinal (10) \newline
+Strictly or partly cross-sectional (6) \newline
+Longitudinal, wave 1 as only baseline (3) 
+&
+The cleaned datasets for each wave are combined in different ways, depending on the selected option. \\
+\addlinespace
+Exclusion criteria &
+Subjects married before 18 \newline
+Subjects from Israel \newline
+Subjects under 55 at recruitment \newline
+Subjects born after 1954
+&
+The analysts in the original study often used idiosyncratic exclusion criteria, which were then used in this study. Because the original paper did not specify whether combinations of these were used, a maximum of one exclusion criterion per universe was applied. \\
+\addlinespace
+Dependent variables &
+Heart attack / stroke ever (16) \newline
+Age at heart attack / stroke (9) \newline
+Heart attack / stroke since last interview (7) \newline
+Main cause of death: heart attack / stroke (5)
+&
+Seven combinations of the four dependent variables were used by the analysts in the original study. Although other combinations are possible, this decision only included the operationalisations from the original study. \\
+\addlinespace
+Confounders &
+Age (12) \newline
+Sex (12) \newline
+Country (7) \newline
+Smoking (6) \newline
+Education (4) \newline
+Physical activity (4) \newline
+No confounders (2)
+&
+Only confounders used by at least four analysts, except `no confounders', were included to ensure feasibility of the multiverse analysis. \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Note}. Numbers in parentheses indicate how often each option was selected across analytical teams.
+\item \textit{Note}. For the independent variable (IV), all teams but two used ``cohabiting married" (CM). Some analysts also included registered partnership, and ``married living apart". However, since the original research question only focused on CM, this is the only variable used as IV.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsubsection{Definition of decision
+space}\label{definition-of-decision-space}
+
+To define the decision space, all options of six different decisions
+made by the teams in Kowall et al. (2025) were identified based on
+information provided in the original publication (see
+Table\textasciitilde{}\ref{tab:decision_space}). When systematically
+combining all options across decisions, the decision space consisted of
+129024 universes. After removing invalid research paths, 82944 valid
+universes remained.
+
+\subsubsection{Classifying sources of variation using the
+AB-framework}\label{classifying-sources-of-variation-using-the-ab-framework}
+
+Before running the analyses, the selected decisions are classified using
+the AB-framework. Decisions regarding missing data and statistical model
+choice are considered harmful. Decisions regarding the
+operationalisation of the dependent variable and the selection of
+confounders and exclusion criteria are considered helpful. Additionally,
+because the framework classifies variations over time as `different
+target populations', which are meaningful, the data structure is
+classified as helpful. Table \textasciitilde{}\ref{tab:decision_space}
+also includes the classification of decisions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{round_robin_schematic.png}
+    \caption{Schematic overview of Round Robin sampling algorithm. U: universe; T: the set of selected universes. Figure was created by the author for this research report.}
+    \label{fig:round_robin}
+\end{figure}
+
+\subsubsection{Round Robin sampling}\label{round-robin-sampling}
+
+Because the number of reasonable universes grows exponentially with the
+number of decisions and their options, the computational cost of
+multiverse analyses increases rapidly. To solve this problem, Liu,
+Althoff, and Heer (2023) have proposed sampling universes one by one. By
+directly calculating their outcomes and decision sensitivities, it is
+possible to approximate multiverse results without having to explore the
+full decision space. They evaluated various algorithms and found that
+Round Robin sampling was one of the most effective methods. Therefore,
+this method will be applied in the present study.
+
+\textbf{NOTE: Because I eventually decided to program the Round Robin
+sampler myself, I decided to move away from `calculating the outcomes
+one by one'. I will include some text here describing how I programmed
+the sampler in 2 steps: first by mapping what decision options
+correspond to which row numbers, then sampling from these row numbers,
+and subsequently filtering sampled row numbers from the original
+decision space df (as sampling directly from the decision space was too
+computationally heavy). This means that all universes are sampled
+simultaneously and I ended up with a new file containing the sampled
+decision space - which will be used for the multiverse. By setting a
+seed, I ensure the sample is the same every time I run the sampler.}
+
+Round Robin sampling aims to represent each decision option in the
+multiverse at least once. The algorithm iteratively goes over all
+decisions and their options and samples one universe at each stage. The
+sampling is done without replacement, to make sure each sampled universe
+is included at most once. For a visual example of how the algorithm
+works, see Figure\textasciitilde{}\ref{fig:round_robin}.
+
+When defining the number of sampled universes, it is important to make
+sure enough data is available for every option to quantify the decision
+sensitivity. The operationalisations of the dependent variable and the
+confounders have the most options (7 and 64, respectively). Assuming a
+sample size of at least 30 outcomes/universes per option (or more if
+that is feasible computationally and within the time scope of this
+project), this would result in 6400 sampled universes in total.
+
+\subsubsection{Converting OR and HR to
+RR}\label{converting-or-and-hr-to-rr}
+
+\textbf{NOTE: In the first place, I wanted to convert all effect sizes
+to Odds Ratio's. This turns out not to be possible. Based on:}
+
+\begin{itemize}
+    \item \url{https://pubmed.ncbi.nlm.nih.gov/31808145/}
+    \item \url{https://ebm-helper.cn/en/Conv/OR_RR.html}
+    \item \url{https://ebm-helper.cn/en/Conv/HR_RR.html}
+\end{itemize}
+
+\textbf{it seems that it is possible to convert both HR and OR to risk
+ratios, which I will do. I will add a paragraph here explaining how this
+conversion works.}
+
+\subsubsection{Decision sensitivity}\label{decision-sensitivity}
+
+So far, the robustness of multiverse outcomes has often been assessed
+using specification curve analysis (SCA). In this type of analysis, each
+universe is plotted against its associated estimated effect size
+(Simonsohn, Simmons, and Nelson 2015). However, as this only provides
+information about the robustness of the results, but not the decision
+sensitivity, it will only be used as a visual aid to inspect if the full
+outcome distribution is robust to different analytic strategies.
+
+More recently, Liu, Althoff, and Heer (2023) have proposed using the
+K-samples Anderson-Darling test (AD-test) to quantify not only the
+robustness of the results, but also the decision sensitivity -- the
+extent to which different options within each analytical decision lead
+to different outcomes. For each option, an effect size distribution is
+constructed, consisting of the results from all universes containing
+that option. This means that within each outcome distribution the option
+of one specific decision remains constant, while other analytical
+decisions and their options vary. Next, the AD test is used to test
+whether the outcome distributions of the different options within the
+same decision originate from the same underlying distribution. If this
+null hypothesis is rejected, the decision in question is classified as
+`sensitive'.
+
+Given that there are 64 confounder options, consisting of combinations
+of 7 variables, it is uncertain whether the AD test will perform well.
+Should this not be the case, the confounders will be analysed in a
+slightly different way, namely by categorizing for each option whether
+or not it is included in the universe, resulting in two outcome
+distributions per option (included/excluded). In the case of the
+confounders, this would mean that there would be only 14 options instead
+of 64. A Kolmogorov-Smirnov (K-S) test, similar to the AD test but with
+two samples, will then be used to quantify whether the two outcome
+distributions originate from the same underlying distribution.
+
+\subsubsection{Technical specifications}\label{technical-specifications}
+
+All data are analysed using R, with packages \texttt{tidyverse},
+\texttt{ggalluvial}, \texttt{multiverse}, \texttt{lme4},
+\texttt{survival}, \texttt{geepack}, \texttt{kSamples} and \texttt{dgof}
+Team (2024).
+
+\subsubsection{Supplementary Materials}\label{supplementary-materials}
+
+All code scripts containig sampler and multiverse functions can be found
+\href{https://github.com/lodewijn/ManyAnalystThesisCompendium}{here}.
+
+\section{Results}\label{results}
+
+Figure\textasciitilde{}\ref{fig:sim_DV_dist} shows simulated example
+distributions of outcomes from the universes across options of
+\texttt{dependent\ variable\ operationalisations\textquotesingle{},\ 1-5\ were\ generated\ from\ a\ normal\ distribution,\ and\ 6-7\ from\ a\ beta-distribution.\ Given\ that\ not\ all\ outcome\ distributions\ have\ the\ same\ underlying\ distribution,\ the\ AD-test\ will\ \ classified\ this\ decision\ as}sensitive'.
+Because this is a substantially meaningful decision, this would mean
+that finding variation in the effect sizes may not be that problematic
+for the reproducibility of science.
+
+\section{Discussion}\label{discussion}
+
+\section{Notes}\label{notes}
+
+\begin{itemize}
+\tightlist
+\item
+  liu: In other words, K--S test and LR may consider a decision to be
+  more sensitive simply because the decision has more options.
+\end{itemize}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-arnold_dgof_2011}
+Arnold, Taylor B., and John W. Emerson. 2011. {``Dgof: {Discrete}
+{Goodness}-of-{Fit} {Tests}.''}
+\url{https://CRAN.R-project.org/package=dgof}.
+
+\bibitem[\citeproctext]{ref-auspurg_toward_2024}
+Auspurg, Katrin, and Josef Brüderl. 2024. {``Toward a More Credible
+Assessment of the Credibility of Science by Many-Analyst Studies.''}
+\emph{Proceedings of the National Academy of Sciences} 121 (38):
+e2404035121. \url{https://doi.org/10.1073/pnas.2404035121}.
+
+\bibitem[\citeproctext]{ref-bastiaansen_time_2020}
+Bastiaansen, Jojanneke A., Yoram K. Kunkels, Frank J. Blaauw, Steven M.
+Boker, Eva Ceulemans, Meng Chen, Sy-Miin Chow, et al. 2020. {``Time to
+Get Personal? {The} Impact of Researchers Choices on the Selection of
+Treatment Targets Using the Experience Sampling Methodology.''}
+\emph{Journal of Psychosomatic Research} 137 (October): 110211.
+\url{https://doi.org/10.1016/j.jpsychores.2020.110211}.
+
+\bibitem[\citeproctext]{ref-bates_fitting_2015}
+Bates, Douglas, Martin Mächler, Ben Bolker, and Steve Walker. 2015.
+{``Fitting {Linear} {Mixed}-{Effects} {Models} {Using} \textbf{Lme4}.''}
+\emph{Journal of Statistical Software} 67 (1).
+\url{https://doi.org/10.18637/jss.v067.i01}.
+
+\bibitem[\citeproctext]{ref-breznau_observing_2022}
+Breznau, Nate, Eike Mark Rinke, Alexander Wuttke, Hung H. V. Nguyen,
+Muna Adem, Jule Adriaans, Amalia Alvarez-Benjumea, et al. 2022.
+{``Observing Many Researchers Using the Same Data and Hypothesis Reveals
+a Hidden Universe of Uncertainty.''} \emph{Proceedings of the National
+Academy of Sciences} 119 (44): e2203150119.
+\url{https://doi.org/10.1073/pnas.2203150119}.
+
+\bibitem[\citeproctext]{ref-brunson_ggalluvial_2020}
+Brunson, Jason. 2020. {``Ggalluvial: {Layered} {Grammar} for {Alluvial}
+{Plots}.''} \emph{Journal of Open Source Software} 5 (49): 2017.
+\url{https://doi.org/10.21105/joss.02017}.
+
+\bibitem[\citeproctext]{ref-bulbulia_workflow_2023}
+Bulbulia, Joseph A. 2023. {``A Workflow for Causal Inference in
+Cross-Cultural Psychology.''} \emph{Religion, Brain \& Behavior} 13 (3):
+291--306. \url{https://doi.org/10.1080/2153599X.2022.2070245}.
+
+\bibitem[\citeproctext]{ref-del_giudice_travelers_2021}
+Del Giudice, Marco, and Steven W. Gangestad. 2021. {``A {Traveler}'s
+{Guide} to the {Multiverse}: {Promises}, {Pitfalls}, and a {Framework}
+for the {Evaluation} of {Analytic} {Decisions}.''} \emph{Advances in
+Methods and Practices in Psychological Science} 4 (1): 2515245920954925.
+\url{https://doi.org/10.1177/2515245920954925}.
+
+\bibitem[\citeproctext]{ref-forbes_supporting_2023}
+Forbes, Heather J., Jason C. Travers, and Jenee Vickers Johnson. 2023.
+{``Supporting the Replication of Your Research.''} In \emph{Research
+{Ethics} in {Behavior} {Analysis}}, 237--62. Academic Press.
+\url{https://doi.org/10.1016/B978-0-323-90969-3.00003-7}.
+
+\bibitem[\citeproctext]{ref-gould_same_2025}
+Gould, Elliot, Hannah S. Fraser, Timothy H. Parker, Shinichi Nakagawa,
+Simon C. Griffith, Peter A. Vesk, Fiona Fidler, et al. 2025. {``Same
+Data, Different Analysts: Variation in Effect Sizes Due to Analytical
+Decisions in Ecology and Evolutionary Biology.''} \emph{BMC Biology} 23
+(1): 35. \url{https://doi.org/10.1186/s12915-024-02101-x}.
+
+\bibitem[\citeproctext]{ref-halekoh_r_2006}
+Halekoh, Ulrich, Søren Højsgaard, and Jun Yan. 2006. {``The \emph{r}
+{Package} \textbf{Geepack} for {Generalized} {Estimating}
+{Equations}.''} \emph{Journal of Statistical Software} 15 (2).
+\url{https://doi.org/10.18637/jss.v015.i02}.
+
+\bibitem[\citeproctext]{ref-hoogeveen_many-analysts_2023}
+Hoogeveen, Suzanne, Alexandra Sarafoglou, Balazs Aczel, Yonathan Aditya,
+Alexandra J. Alayan, Peter J. Allen, Sacha Altay, et al. 2023a. {``A
+Many-Analysts Approach to the Relation Between Religiosity and
+Well-Being.''} \emph{Religion, Brain \& Behavior} 13 (3): 237--83.
+\url{https://doi.org/10.1080/2153599X.2022.2070255}.
+
+\bibitem[\citeproctext]{ref-hoogeveen_many-analysts_2023-1}
+Hoogeveen, Suzanne, Alexandra Sarafoglou, Michiel van Elk, and Eric-Jan
+Wagenmakers. 2023b. {``Many-Analysts Religion Project: Reflection and
+Conclusion.''} \emph{Religion, Brain \& Behavior} 13 (3): 356--63.
+\url{https://doi.org/10.1080/2153599X.2022.2070263}.
+
+\bibitem[\citeproctext]{ref-kowall_marital_2025}
+Kowall, Bernd, Linda Juel Ahrenfeldt, Jale Basten, Heiko Becher, Tilman
+Brand, Julia Braun, Swaantje Casjens, et al. 2025. {``Marital Status and
+Risk of Cardiovascular Disease -- a Multi-Analyst Study in
+Epidemiology.''} \emph{European Journal of Epidemiology} 40 (5):
+497--509. \url{https://doi.org/10.1007/s10654-025-01235-8}.
+
+\bibitem[\citeproctext]{ref-kummerfeld_one_2023}
+Kummerfeld, Erich, and Galin L. Jones. 2023. {``One Data Set, Many
+Analysts: {Implications} for Practicing Scientists.''} \emph{Frontiers
+in Psychology} 14 (February): 1094150.
+\url{https://doi.org/10.3389/fpsyg.2023.1094150}.
+
+\bibitem[\citeproctext]{ref-liu_approximation_2023}
+Liu, Yang, Tim Althoff, and Jeffrey Heer. 2023. {``Approximation and
+{Progressive} {Display} of {Multiverse} {Analyses}.''} arXiv.
+\url{https://doi.org/10.48550/arXiv.2305.08323}.
+
+\bibitem[\citeproctext]{ref-masur_specr_2020}
+Masur, Philipp K., and Michael Scharkow. 2020. {``Specr: {Conducting}
+and {Visualizing} {Specification} {Curve} {Analyses}.''}
+\url{https://doi.org/10.32614/CRAN.package.specr}.
+
+\bibitem[\citeproctext]{ref-rohrer_what_2025}
+Rohrer, Julia M., George Davey Smith, and Marcus Munafò. 2025. {``What
+Can Be Learned When Multiple Analysts Arrive at Different Estimates.''}
+\emph{European Journal of Epidemiology} 40 (5): 493--95.
+\url{https://doi.org/10.1007/s10654-025-01249-2}.
+
+\bibitem[\citeproctext]{ref-sarma_multiverse_2021}
+Sarma, Abhraneel, Alex Kale, Michael Jongho Moon, Nathan Taback, Fanny
+Chevalier, Jessica Hullman, and Matthew Kay. 2021. {``Multiverse:
+{Multiplexing} {Alternative} {Data} {Analyses} in {R} {Notebooks}.''}
+Open Science Framework. \url{https://doi.org/10.31219/osf.io/yfbwm}.
+
+\bibitem[\citeproctext]{ref-scholz_ksamples_2019}
+Scholz, Fritz W., and Jiajuan Zhu. 2019. {``{kSamples}: {K}-{Sample}
+{Rank} {Tests} and {Their} {Combinations}.''}
+\url{https://CRAN.R-project.org/package=kSamples}.
+
+\bibitem[\citeproctext]{ref-silberzahn_many_2018}
+Silberzahn, R., E. L. Uhlmann, D. P. Martin, P. Anselmi, F. Aust, E.
+Awtrey, Š. Bahník, et al. 2018. {``Many {Analysts}, {One} {Data} {Set}:
+{Making} {Transparent} {How} {Variations} in {Analytic} {Choices}
+{Affect} {Results}.''} \emph{Advances in Methods and Practices in
+Psychological Science} 1 (3): 337--56.
+\url{https://doi.org/10.1177/2515245917747646}.
+
+\bibitem[\citeproctext]{ref-simonsohn_specification_2015}
+Simonsohn, Uri, Joseph P. Simmons, and Leif D. Nelson. 2015.
+{``Specification {Curve}: {Descriptive} and {Inferential} {Statistics}
+on {All} {Reasonable} {Specifications}.''} \emph{SSRN Electronic
+Journal}. \url{https://doi.org/10.2139/ssrn.2694998}.
+
+\bibitem[\citeproctext]{ref-steegen_increasing_2016}
+Steegen, Sara, Francis Tuerlinckx, Andrew Gelman, and Wolf Vanpaemel.
+2016. {``Increasing {Transparency} {Through} a {Multiverse}
+{Analysis}.''} \emph{Perspectives on Psychological Science} 11 (5):
+702--12. \url{https://doi.org/10.1177/1745691616658637}.
+
+\bibitem[\citeproctext]{ref-r_core_team_r_2024}
+Team, R Core. 2024. {``R: {A} {Language} and {Environment} for
+{Statistical} {Computing}.''} Vienna, Austria: R Foundation for
+Statistical Computing. \url{https://www.R-project.org/}.
+
+\bibitem[\citeproctext]{ref-therneau__a_2024}
+Therneau, T. 2024. {``\_A {Package} for {Survival} {Analysis} in {R}\_.
+{R} Package.''} \url{https://CRAN.R-project.org/package=survival}.
+
+\bibitem[\citeproctext]{ref-wickham_welcome_2019}
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
+McGowan, Romain François, Garrett Grolemund, et al. 2019. {``Welcome to
+the {Tidyverse}.''} \emph{Journal of Open Source Software} 4 (43): 1686.
+\url{https://doi.org/10.21105/joss.01686}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}

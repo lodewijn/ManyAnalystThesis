@@ -1,0 +1,170 @@
+---
+title: "Variation in Many-Analyst Projects: Problematic or Helpful? A Multiverse Approach to Address Different Sources of Variation"
+subtitle: "Thesis Proposal"
+format: html
+editor: visual
+bibliography: thesis_bibliography_28092025.bib
+link-citations: true
+author: 
+- name: Loesje Ubbink (6077137)
+  orcid: 0009-0009-3718-8952
+  affiliations:
+      - name: Methodology and Statistics for the Behavioural, Biomedical and Social Sciences, Utrecht University
+- name: Supervisor - Suzanne Hoogeveen
+  orcid: 0000-0002-1304-8615
+date: "October 10, 2025"
+journal:
+  name: quarto-journals/plos
+
+---
+
+\documentclass{article}
+\usepackage{graphicx} 
+\usepackage[authoryear,round]{natbib}
+\usepackage{multirow}
+\usepackage[normalem]{ulem}
+\useunder{\uline}{\ul}{}
+\usepackage{geometry}                  
+\usepackage{booktabs, multirow}        
+\usepackage[referable]{threeparttablex}
+
+\title{Variation in Many-Analyst Projects: Problematic or Helpful? A Multiverse Approach to Address Different Sources of Variation \\ \small Thesis Proposal}
+\author{Loesje Ubbink (6077137) \\ Thesis Supervisor: Suzanne Hoogeveen \\ \small Methodology and Statistics for the Behavioural, Biomedical and Social Sciences \\ \small Utrecht University \\ \small Journal?}
+\date{October 10, 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Everything that is based on ‘proper’ science must be true, right? As long as the theory on which it is based is valid and some statistics are applied, the result is assumed to be correct and reproducible. However, recent studies have shown considerable variation in outcomes when multiple researchers answer the same question using the same data, raising concerns about the reproducibility and credibility of science. For example, \citet{silberzahn_many_2018} asked 29 teams to investigate whether dark-skin-toned soccer players are more likely to receive red cards from referees than light-skin-toned players. The results varied widely,  69\% found significantly positive effects, while 31\% did not report any significance. Furthermore, in a study where 16 teams estimated the effect of marital status on cardiovascular outcomes, the results varied from negative to positive effects (e.g., odds-ratios ranged from 0.72 - 1.29) \citep{kowall_marital_2025}. 
+
+Many-analyst projects can be useful to gain insight into natural variation in research, as well as robustness of analyses. However, various studies have failed to identify where this variation stems from. According to \citet{silberzahn_many_2018}, analysts' prior beliefs, level of experience or peer-rated quality of the analysis did not seem to explain the variation. Variation in the study by \citet{kowall_marital_2025} seemed to stem mainly from the analysts’ choice of longitudinal versus cross-sectional data, rather than variable definitions or statistical models. However, as \citet{simonsohn_specification_2015} argues, "regressions with and without a certain set of covariates (...) are different answers to different questions." Interpreting variation within and across many-analyst projects is difficult – is there a “hidden universe of uncertainty” that poses a problem for credible and reproducible science or is the variation meaningful and can it drive the advancement of theories? 
+
+\begin{table}[ht]
+\caption{Sources of variation according to \citet{auspurg_toward_2024}}
+\begin{tabular}{ll}
+\hline
+Problematic                                                                                                                             & Helpful                                                                                                                                                                                                                     \\ \hline
+\begin{tabular}[c]{@{}l@{}}(a) Model uncertainty,\\ including subjective choices \\ in data handling, and choosing a \\ type of statistical model \\ (b) Coding Errors\end{tabular} & \begin{tabular}[c]{@{}l@{}}(c) Substantively meaningful variation, \\ based on different definitions of dependent,\\ independent and co-variables \\ and/or target populations \\ (changes over time)\end{tabular}
+\end{tabular}
+\end{table}
+
+\newpage
+According to \citet{auspurg_toward_2024}, three different sources of variation can be distinguished in many-analyst projects. As can be seen in table 1, \citet{auspurg_toward_2024} classify sources (a) and (b) as 'problematic', because they can introduce uncertainty in scientific claims, making them less credible. Source (c), on the other hand, can be seen as 'helpful', because it can provide information about substantive variation that actually exists in the population (e.g., if two analysts include different covariates and thus provide different answers to different questions this may add to the general theory).
+
+
+\subsection*{Research Question}
+How do different sources of variation, including handling missing data, choice of statistical model and the definition of outcome variables, covariates and target population (longitudinal versus cross-sectional), contribute to variation in many-analyst projects? 
+
+\subsection*{Expectations}
+As with previous multiverse and multi-analyst studies, I expect considerable variation depending on the analytical choices. Because the explanations for the variation in previous studies varied widely, and may differ across studies, I have reservations about making explicit expectations in this regard. However, since I will be basing my study on \citet{kowall_marital_2025}, I expect to potentially find similar patterns (where the type of data had most impact on the estimates) — although this may not be the case, as they only included 16 teams, and the multiverse analysis will be more extensive.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{multiverse_graph.jpg}
+    \caption{Comprehensive Overview of Multiverse Analysis by \citet{simson_one_2024}}
+    \label{fig:placeholder}
+\end{figure}
+
+\newpage
+\section{Analytic Strategy}
+Although many-analyst projects are able to quantify some of the variance stemming from various analytic decisions, this is not done systematically. Multiverse analysis is a way to systematically map a wide variety of reasonable ‘research paths’, with the aim of increasing transparency about subjective choices and their impact on the associated results. With this method it is possible to distinguish different sources of variation and evaluate their impact on the results. Hopefully, this will increase awareness of the sensitivity of some statistical paths and the robustness of their estimated results, as well as knowledge about the degree to which different sources of variation play a role in the variation obtained from many-analyst projects \citep{steegen_increasing_2016}. For a comprehensive overview of the steps involved in multiverse analysis, see figure 1 \citep{simson_one_2024}. 
+
+\newpage
+    \begin{table}[ht]
+\begin{threeparttable}
+\caption{Different choices that were made by analysts in the study by \citet{kowall_marital_2025}. The multiverse analysis in this study will be based on these choices.}
+\begin{tabular}{lll}
+\multicolumn{3}{l}{(a) Potentially problematic sources of variation}                                                                                                                                                                                           \\ \hline
+\begin{tabular}[c]{@{}l@{}}Missing Data \\ Handling Methods\end{tabular}                  & \multicolumn{2}{l}{Type of Model}                                                                                                                                  \\ \hline
+Complete cases (16)                                                                       & \multicolumn{2}{l}{\begin{tabular}[c]{@{}l@{}}Cox Proportional \\ Hazards model (6)\end{tabular}}                                                                  \\
+\begin{tabular}[c]{@{}l@{}}Imputed data from\\ SHARE (3)\end{tabular}   & \multicolumn{2}{l}{Logistic Regression (5)}                                                                                                                        \\
+\\ "No information" (1)                                                                      & \multicolumn{2}{l}{Log-binomial model (2)}                                                                                                                         \\
+                                                                                          & \multicolumn{2}{l}{Mixed-effects logistic regression (1)}                                                                                                          \\
+                                                                                          & \multicolumn{2}{l}{Discrete time mixed effect model (1)}                                                                                                           \\
+                                                                                          & \multicolumn{2}{l}{Generalized estimating equations (1)}                                                                                                           \\
+\multicolumn{3}{l}{}                                                                                                                                                                                                                                           \\
+\multicolumn{3}{l}{(c) Potentially meaningful sources of variation}                                                                                                                                                                                            \\ \hline
+\begin{tabular}[c]{@{}l@{}}Outcome (Dependent\\ Variable)\end{tabular}                    & \begin{tabular}[c]{@{}l@{}}Adjustment\\ Set (Covariates)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Type of data\\ (change over time)\end{tabular}                  \\ \hline
+\begin{tabular}[c]{@{}l@{}}Heart attack / \\ stroke ever (16)\end{tabular}                & Age (12)                                                              & Strictly longitudinal (10)                                                                 \\
+\begin{tabular}[c]{@{}l@{}}Age at heart attack / \\ stroke (9)\end{tabular}               & Sex (12)                                                              & \begin{tabular}[c]{@{}l@{}}Longitudinal with\\ wave 1 \\ as only baseline (3)\end{tabular} \\
+\begin{tabular}[c]{@{}l@{}}Heart attack / stroke \\ since last interview (7)\end{tabular} & Country (7)                                                           & \begin{tabular}[c]{@{}l@{}}Strictly or partly \\ cross-sectional (6)\end{tabular}          \\
+\begin{tabular}[c]{@{}l@{}}Main cause of death \\ heart attack / stroke (5)\end{tabular}  & Smoking (6)                                                           &                                                                                            \\
+                                                                                          & Education (4)                                                         &                                                                                            \\
+                                                                                          & Physical activity (4)                                                 &                                                                                           
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+    \footnotesize
+    \raggedright
+\note{The numbers in brackets behind the decisions denote how many analysts made this choice in their analysis.}
+\\
+\note{The adjustment sets in the original study by \citet{kowall_marital_2025} contained 25 variables. When including all, the multiverse analysis would become too complex, as there would be over 33 million possible combinations. Therefore, I decided to only include covariates that were used by at least four (or more) analysts in the original study, except the 'no covariates' category which will also be included. I am aware this is an arbitrary decision.}
+
+    \end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection*{Analysis Plan}
+Because the study by \citet{kowall_marital_2025} includes many different sources of variation, as researchers used different definitions of their outcome variables and adjustment sets, methods of missing data handling, statistical models, and type of data (longitudinal versus cross-sectional data), I decided to base my multiverse analysis on this study (see table 2 for the exact specifications). 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\linewidth]{Scherm­afbeelding 2025-09-30 om 12.41.12.png}
+    \caption{Oversimplified overview of the multiverse analysis in this study. This figure shows only a part of the multiverse; many more combinations of both the outcome variables and the covariates are possible. \textit{O1-O4: outcome variables, as described in table 2; COX: Cox Proportional Hazards model, LOG: logistic regression, LOG-B: log-binomial model, ME-LOG: mixed-effects logistic regression, DT-ME: discrete time mixed effect model, GEE: generalized estimating equations; CTR: country, EDU: education, SMOK: smoking, PHYS: physical activity.}}
+    \label{fig:placeholder}
+\end{figure}
+
+\newpage
+Figure 2 shows that — even if you look at a small part of the multiverse — there are many different paths that can be taken to estimate the effect of marriage on cardiovascular disease. When looking at table 3, it becomes clear that there are large numbers of possible analyses. Since this set of reasonable paths is too large to estimate all effect sizes, based on \citet{simonsohn_specification_2015}, I decided to randomly sample a subset of \textbf{N} possible specifications. %How many? Also, if I do that, then is it also not possible/better to include all covariates?
+
+\newpage
+\begin{table}[ht]
+\caption{Number of possible analysis paths based on various decision patterns.}
+\begin{tabular}{lll}
+\hline
+Decision                                                                                                                                                                                                                                                                                            & \begin{tabular}[c]{@{}l@{}}Unique\\ possibilities\end{tabular} & \begin{tabular}[c]{@{}l@{}}Number of \\ combinations\end{tabular} \\ \hline
+Missingness                                                                                                                                                                                                                                                                                         & 2                                                              & 2                                                                 \\
+Model Type                                                                                                                                                                                                                                                                                          & 6                                                              & 6                                                                 \\
+Outcome                                                                                                                                                                                                                                                                                             & 4                                                              & $2^{4}$ = 16                                                      \\
+Adjustment Set                                                                                                                                                                                                                                                                                      & 7                                                              & $2^{7}$ = 128                                                     \\
+Data Type                                                                                                                                                                                                                                                                                           & 3                                                              & 3                                                                 \\ \hline
+\textbf{Total}                                                                                                                                                                                                                                                                                      & \textbf{}                                                      & \textbf{73.728}                                                   \\ \hline
+\begin{tabular}[c]{@{}l@{}}If missingness is disregarded; \\ and only two data types are used \\ (strictly longitudinal/cross-sectional).\end{tabular}                                                                                                                                                  &                                                                & 24.576                                                            \\ \hline
+\begin{tabular}[c]{@{}l@{}}If missingness is disregarded; \\ only two data types; \\ and only covariates that at least 5 analysts chose are used.\end{tabular}                                                                                                                                  &                                                                & 12.288                                                            \\ \hline
+\begin{tabular}[c]{@{}l@{}}If missingness is disregarded; \\only two data types; \\ only covariates that at least 5 analysts chose; \\ and only outcome variables that at least 7 analysts chose are used.\end{tabular}                                                                    &                                                                & 6.144                                                             \\ \hline
+\begin{tabular}[c]{@{}l@{}}If missingness is not disregarded; \\ only two data types; \\  only covariates that at least 5 analysts chose; \\  only outcome variables that at least 7 analysts chose; \\ and only the models that at least 2 analysts chose are used.\end{tabular} &                                                                & 3.072                                                            
+\\ \hline
+\begin{tabular}[c]{@{}l@{}}If missingness is disregarded; \\ only two data types; \\  only covariates that at least 5 analysts chose; \\  only outcome variables that at least 7 analysts chose; \\ and only the models that at least 2 analysts chose are used.\end{tabular} &                                                                & 1.536                                          
+\end{tabular}
+
+\end{table}
+
+\newpage
+\subsection*{Data}
+Like \citet{kowall_marital_2025}, I will make use of the SHARE dataset. 
+
+\subsection*{Software}
+All analyses will be performed in RStudio \citep{r_core_team_r_nodate}. I will likely use (at least) the following packages: 
+\begin{itemize}
+  \item tidyverse \citep{wickham_welcome_2019}
+  \item ggalluvial \citep{brunson_ggalluvial_2020}
+  \item multiverse \citep{sarma_multiverse_2021}
+  \item specr \citep{masur_specr_2020}
+  \item lme4 \citep{bates_fitting_2015}
+  \item survival \citep{therneau__a_2024}
+  \item geepack \citep{halekoh_r_2006}
+\end{itemize}
+
+
+
+\subsection*{Ethics}
+This project is under review by the Faculty Ethics Review Committee (FETC) of the Faculty of Social Sciences, with registration number: XXX .
+
+\nocite{*}
+\bibliographystyle{plainnat}
+\bibliography{thesis_proposal_references_30092025}
+
+
+\end{document}

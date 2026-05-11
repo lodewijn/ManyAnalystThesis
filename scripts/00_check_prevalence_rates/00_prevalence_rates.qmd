@@ -1,0 +1,124 @@
+---
+title: "Prevalence Rates"
+format: html
+---
+# Load Cleaned Data From All Waves
+```{r}
+# Load Cleaned Data From All Waves and w1
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+w1 <- readRDS(here("data/cleandata/w1_clean.RDS"))
+```
+
+```{r}
+# check what variable names of marriage are because it is not binary yet
+unique(df$dn014_)
+
+# create binary exposure variable
+# 1 = married and living together
+# 0 = everything else that does not meet this condition
+df$dn014_binary <- ifelse(df$dn014_ == "Married and living together with spouse", 
+                          1, 
+                          ifelse(is.na(df$dn014_), 
+                                 NA, 
+                                 0))
+```
+
+```{r}
+# Calculate prevalence for heart attack ever
+
+# check what variable names of heart attack ever are because it is not binary yet
+unique(df$ph006d1)
+
+# binary heart attack ever
+df$ph006d1_binary <- ifelse(df$ph006d1 == "Selected", 1,
+       ifelse(df$ph006d1 == "Not selected", 0, NA))
+
+# prevalence heart attack ever
+mean(df$ph006d1_binary, na.rm = TRUE)
+
+# prevalence heart attack ever - per wave
+aggregate(
+  ph006d1_binary ~ wave,
+  data = df,
+  FUN = function(x) mean(x, na.rm = TRUE)
+)
+
+# so not rare! (> 5%)
+```
+
+```{r}
+# Calculate prevalence for stroke ever
+
+# check what variable names of stroke ever are because it is not binary yet
+unique(df$ph006d4)
+
+# binary stroke ever
+df$ph006d4_binary <- ifelse(df$ph006d4 == "Selected", 1,
+       ifelse(df$ph006d4 == "Not selected", 0, NA))
+
+# prevalence stroke ever
+mean(df$ph006d4_binary, na.rm = TRUE)
+
+# prevalence stroke ever - per wave
+aggregate(
+  ph006d4_binary ~ wave,
+  data = df,
+  FUN = function(x) mean(x, na.rm = TRUE)
+)
+
+# so rare! (< 5%)
+
+sum(is.na(df))
+```
+
+```{r}
+# p0 for all data types
+# First run all cleaning scripts, then the data prep and outcome/exposure functions
+source(here("scripts/04_set_up_multiverse/01_data_type_function.R"))
+source(here("scripts/04_set_up_multiverse/02_exclusion_function.R"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+source(here("scripts/04_set_up_multiverse/04_outcome_function.R"))
+
+df <- exposure_function(df)
+df <- outcome_function(df, "event_ever")
+
+df_cross_all <- df_type_function(df, "cross_all", w1)
+df_crossw1 <- df_type_function(df, "crossw1", w1)
+df_longw1 <- df_type_function(df, "long_w1", w1)
+df_longnostrict <- df_type_function(df, "long_nostrict", w1)
+
+PrevalenceDT <- c(mean(df_cross_all$event_ever_binary[df_cross_all$exposure == 0], na.rm=T),
+                  mean(df_crossw1$event_ever_binary[df_crossw1$exposure == 0], na.rm=T), mean(df_longw1$event_ever_binary[df_longw1$exposure == 0], na.rm=T), mean(df_longnostrict$event_ever_binary[df_longnostrict$exposure == 0], na.rm=T))
+```
+
+```{r}
+# p0 for all exclusion criteria
+
+# reset the df to the full dataset
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+
+# First run all cleaning scripts, then the data prep and outcome/exposure functions
+source(here("scripts/04_set_up_multiverse/01_data_type_function.R"))
+source(here("scripts/04_set_up_multiverse/02_exclusion_function.R"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+source(here("scripts/04_set_up_multiverse/04_outcome_function.R"))
+
+df <- exposure_function(df)
+df <- outcome_function(df, "event_ever")
+ 
+married_before18 <- exclusion_function(df, "married_before18")
+divorced_widowed <- exclusion_function(df, "divorced_widowed")
+country <- exclusion_function(df, "country")
+younger_than_55_w1 <- exclusion_function(df, "younger_than_55_w1")
+born_after1954 <- exclusion_function(df, "born_after1954")
+
+PrevalenceExposure <- c(mean(married_before18$event_ever_binary[married_before18$exposure == 0], na.rm=T),
+mean(divorced_widowed$event_ever_binary[divorced_widowed$exposure == 0], na.rm=T),
+mean(country$event_ever_binary[country$exposure == 0], na.rm=T),
+mean(younger_than_55_w1$event_ever_binary[younger_than_55_w1$exposure == 0], na.rm=T),
+mean(born_after1954$event_ever_binary[born_after1954$exposure == 0], na.rm=T))
+
+Prevalence <- c(PrevalenceExposure, PrevalenceDT)
+mean(Prevalence)
+```
+

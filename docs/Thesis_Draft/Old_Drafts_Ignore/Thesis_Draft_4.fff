@@ -1,0 +1,48 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[H]
+
+\caption{\label{fig-roundrobin}Schematic overview of Round Robin
+sampling algorithm. U: universe; T: the set of sampled universes. Figure
+was created by L. Ubbink.}
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{RoundRobinkleur.png}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[H]
+
+\caption{\label{fig-spec-curve}Specification curve of multiverse
+results, where risk ratios are arranged from lowest to highest, and then
+plotted against all universes with varying decisions.}
+
+\includegraphics[width=1.7\linewidth,height=\textheight,keepaspectratio]{specification_curve.pdf}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[H]
+
+\caption{\label{fig-dens-plot}Densities of risk ratios (RR) across
+decisions and their options.}
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{density_plot.png}
+
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+[H]
+
+\caption{\label{fig-dens-ADJ}Densities of risk ratios (RR) across
+inclusion/exclusion of different adjustment variables.}
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{dens_per_confounder.png}
+
+\end{figure*}

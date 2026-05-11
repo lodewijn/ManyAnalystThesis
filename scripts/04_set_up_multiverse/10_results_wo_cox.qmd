@@ -1,0 +1,43 @@
+---
+title: "Multiverse Results"
+format: html
+---
+
+# Setup
+```{r, warning=FALSE, message=FALSE}
+library(here)
+
+# Load Cleaned Data From All Waves
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+w1 <- readRDS(here("data/cleandata/w1_clean.RDS"))
+
+# Decision Space: Sampled Universes
+sampled_universes <- readRDS(here("data/sampled_universes/sampled_universes.RDS"))
+
+# Source All Functions
+source(here("scripts/04_set_up_multiverse/01_data_type_function.R"))
+source(here("scripts/04_set_up_multiverse/02_exclusion_function.R"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+source(here("scripts/04_set_up_multiverse/04_outcome_function.R"))
+source(here("scripts/04_set_up_multiverse/05_missingness_function.R"))
+source(here("scripts/04_set_up_multiverse/06_formula_function.R"))
+source(here("scripts/04_set_up_multiverse/07_model_function.R"))
+source(here("scripts/04_set_up_multiverse/08_conversion_function.R"))
+source(here("scripts/04_set_up_multiverse/09_multiverse_function.R"))
+source(here("scripts/04_set_up_multiverse/09b_multiverse_function_parallel.R"))
+source(here("scripts/04_set_up_multiverse/09c_multiverse_function_parallel_intermediate.R"))
+source(here("scripts/04_set_up_multiverse/09d_multiverse_function_final.R"))
+```
+
+# Without Cox
+```{r, warning=F}
+## First run: start 12-04-2026, end 13-04-2026 (wrong - results are overwritten!)
+## Second run (fixes in missingness): start 13-04-2026, end 14-06-2026
+
+sample_wo_cox <- sampled_universes |>
+  filter(!(model_type == "cox_haz"))
+
+results_wo_cox <- multiverse_function_parallel_intermediate(df, sample_wo_cox, w1, subset_size = 100)
+```
+
+# All models

@@ -1,0 +1,66 @@
+---
+title: "Multiverse Results"
+format: html
+---
+
+# Setup
+```{r, warning=FALSE, message=FALSE}
+library(here)
+
+# Load Cleaned Data From All Waves
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+w1 <- readRDS(here("data/cleandata/w1_clean.RDS"))
+
+# Decision Space: Sampled Universes
+sampled_universes_100 <- readRDS(here("data/sampled_universes/sampled_universes_100.RDS"))
+
+# Source Multiverse Function
+source(here("scripts/04_set_up_multiverse/09e_multiverse_function_final_corrected.R"))
+```
+
+# Without Cox
+```{r, warning=F}
+## First run: start 12-04-2026, end 13-04-2026 (wrong - results are overwritten!)
+## Second run (fixes in missingness): start 13-04-2026, end 14-06-2026
+
+#sample_wo_cox <- sampled_universes |>
+#  filter(!(model_type == "cox_haz"))
+
+#results_wo_cox <- multiverse_function_parallel_intermediate(df, sample_wo_cox, w1, subset_size = 100)
+```
+
+# All models
+```{r, warning=F}
+## First run: start 14-04-2026 (30 universes per option), end 15-03-2026
+
+# results_multiverse <- multiverse_function(df, sampled_universes, w1, subset_size = 100)
+# DF: all_models_final_results_1920_2026-04-15.RDS
+
+## Second run: start 17-04-2026 (100 universes per option), end 20-04-2026
+#multiverse_function(df, sampled_universes_100, w1, subset_size = 100)
+# DF: all_models_final_results_Univ100_6400_2026-04-20.RDS
+```
+
+# Corrected Cox Conversion (run only on Cox)
+```{r, warning=FALSE}
+## Third run: start 28-04-2026 (100 universes per option cox only), end 
+sampled_universes_100_cox_only <- sampled_universes_100 |>
+  filter(model_type == "cox_haz")
+
+multiverse_function_corr(df, sampled_universes_100_cox_only, w1, subset_size = 100)
+# DF: corr_all_models_intermediate_results_Univ100_301_to_331_2026-04-28.RDS
+```
+# Combine new Cox results with the other multiverse results
+```{r}
+old_results <- readRDS(here("data/results/all_models_final_results_Univ100_6400_2026-04-20.RDS"))
+
+old_results_NoCox <- old_results |>
+  filter(!c(model_type == "cox_haz"))
+
+newCox <- readRDS(here("data/results/corr_all_models_intermediate_results_Univ100_301_to_331_2026-04-28.RDS"))
+
+results <- bind_rows(old_results_NoCox, newCox)
+
+write_rds(results, here("data/results/corrected_results_final_2026-04-28.RDS"))
+```
+

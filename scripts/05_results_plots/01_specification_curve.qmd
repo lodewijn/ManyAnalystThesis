@@ -1,0 +1,240 @@
+---
+title: "Final Specification curve"
+format: html
+---
+
+#### SETUP ####
+```{r}
+# Load required packages
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+library(specr)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(kSamples)
+```
+
+```{r}
+# Load data
+df_small <- readRDS(here("data/results/all_models_final_results_1920_2026-04-15.RDS"))
+df_large <- readRDS(here("data/results/corrected_results_final_2026-04-28.RDS"))
+
+# Create color gradient function
+gradient <- colorRampPalette(c("#D55E00", "#56B4E9"))
+```
+
+#### NAs ####
+```{r}
+# Replace Inf and 0.000 by NA
+# as both indicate model non-convergence
+df_large <- df_large %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+```
+
+```{r}
+library(tidyverse)
+library(patchwork)
+
+#----------------------------
+# 1. Prepare main data
+#----------------------------
+df_plot <- df_large %>%
+  filter(!is.na(RR)) %>%
+  arrange(RR) %>%
+  mutate(
+    spec_id     = row_number(),
+    significant = p.value < 0.05,
+    data_type = data_type %>%
+      str_replace_all("cross_all",     "Cross-sectional (all)") %>%
+      str_replace_all("cross_w1",      "Cross-sectional (W1)") %>%
+      str_replace_all("long_nostrict", "Longitudinal (no strict)") %>%
+      str_replace_all("long_w1",       "Longitudinal (W1)"),
+    missing_data = missing_data %>%
+      str_replace_all("cc", "Complete cases") %>%
+      str_replace_all("ni", "No information"),
+    exclusion = exclusion %>%
+      str_replace_all("born_after1954",     "Born after 1954") %>%
+      str_replace_all("younger_than_55_w1", "Younger than 55") %>%
+      str_replace_all("married_before18",   "Married before 18") %>%
+      str_replace_all("divorced_widowed",   "Divorced/widowed") %>%
+      str_replace_all("country",            "Country (Israel)") %>%
+      str_replace_all("none",               "None"),
+    model_type = model_type %>%
+      str_replace_all("cox_haz",     "Cox PH") %>%
+      str_replace_all("mix_log_reg", "Mixed logistic") %>%
+      str_replace_all("log_reg",     "Logistic") %>%
+      str_replace_all("log-binom",   "Log-binomial") %>%
+      str_replace_all("time_mix",    "Discrete-time mixed") %>%
+      str_replace_all("GEE",         "GEE")
+  )
+
+#----------------------------
+# 2. Shared settings
+#----------------------------
+x_limits <- c(0, max(df_plot$spec_id))
+
+strip_theme <- theme(
+  axis.line         = element_blank(),
+  axis.text        = element_text(size = 18, colour = "black"),
+  axis.text.x       = element_blank(),
+  axis.ticks        = element_blank(),
+  axis.text.y       = element_text(size = 18, hjust = 1),
+  strip.text.y.left = element_text(angle = 90, hjust = 0.5, size = 18),
+  strip.placement   = "outside",
+  legend.position   = "none",
+  panel.border      = element_blank(),
+  panel.grid        = element_blank(),
+  panel.background  = element_blank()
+)
+
+#----------------------------
+# 3. Adjustment variables
+#----------------------------
+confounders <- c("Age", "None", "Sex", "Smoking", "Education", "Country", "Physical activity")
+
+df_adj_long <- df_plot %>%
+  select(spec_id, adjustment_label, significant) %>%
+  mutate(
+    Age                 = str_detect(adjustment_label, regex("age",     ignore_case = TRUE)),
+    None                = str_detect(adjustment_label, regex("none",     ignore_case = TRUE)),
+    Country             = str_detect(adjustment_label, regex("country", ignore_case = TRUE)),
+    Education           = str_detect(adjustment_label, regex("dn010_",  ignore_case = TRUE)),
+    `Physical activity` = str_detect(adjustment_label, regex("phactiv", ignore_case = TRUE)),
+    Sex                 = str_detect(adjustment_label, regex("dn042_",  ignore_case = TRUE)),
+    Smoking             = str_detect(adjustment_label, regex("br001_",  ignore_case = TRUE))
+  ) %>%
+  pivot_longer(cols = all_of(confounders), names_to = "confounder", values_to = "included") %>%
+  mutate(confounder = factor(confounder, levels = rev(confounders)), panel = "ADJ")
+
+#----------------------------
+# 4. Outcome components
+#----------------------------
+outcome_components <- c("Age at event", "Event ever", "Death", "Since last interview")
+
+df_outcome_long <- df_plot %>%
+  select(spec_id, outcome_label, significant) %>%
+  mutate(
+    `Age at event`   = str_detect(outcome_label, regex("age",   ignore_case = TRUE)),
+    `Event ever`  = str_detect(outcome_label, regex("ever",  ignore_case = TRUE)),
+    Death = str_detect(outcome_label, regex("death", ignore_case = TRUE)),
+    `Since last interview` = str_detect(outcome_label, regex("since", ignore_case = TRUE))
+  ) %>%
+  pivot_longer(cols = all_of(outcome_components), names_to = "component", values_to = "included") %>%
+  mutate(component = factor(component, levels = rev(outcome_components)), panel = "OUT")
+
+#----------------------------
+# 5. All panels — note p_top uses facet_grid to match gtable structure
+#----------------------------
+choice_labels <- c(
+  data_type    = "DT",
+  exclusion    = "EC",
+  missing_data = "MD",
+  model_type   = "SM"
+)
+
+df_middle <- df_plot %>%
+  select(spec_id, data_type, missing_data, exclusion, model_type, significant) %>%
+  pivot_longer(cols = c(data_type, exclusion, missing_data, model_type),
+               names_to = "choice", values_to = "value") %>%
+  mutate(choice = factor(choice, levels = c("data_type", "exclusion", "missing_data", "model_type")))
+
+# Dummy variable so p_top can use facet_grid with same structure
+df_plot$dummy <- "Risk Ratio"
+
+# In ggplot2 4.0, use panel border on the left side only as the vertical line
+strip_theme_with_line <- strip_theme +
+  theme(
+    axis.line.y.left = element_line(colour = "black", linewidth = 0.5)
+  )
+
+p_middle <- ggplot(df_middle, aes(x = spec_id, y = value, colour = significant)) +
+  geom_point(shape = 124, size = 3, alpha = 0.8) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(choice ~ ., scales = "free_y", space = "free_y", switch = "y",
+             labeller = labeller(choice = choice_labels)) +
+  theme_minimal() +
+  strip_theme_with_line +
+  theme(panel.spacing = unit(0.75, "lines"), plot.margin = margin(0, 10, 0, 10)) +
+  labs(x = NULL, y = NULL)
+
+p_outcome <- ggplot(df_outcome_long, aes(x = spec_id, y = component, colour = significant)) +
+  geom_point(data = filter(df_outcome_long, included), shape = 124, size = 3, alpha = 0.8) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  scale_y_discrete(drop = FALSE) +
+  facet_grid(panel ~ ., switch = "y") +
+  theme_minimal() +
+  strip_theme_with_line +
+  theme(plot.margin = margin(0, 10, 0, 10)) +
+  labs(x = NULL, y = NULL)
+
+p_adj <- ggplot(df_adj_long, aes(x = spec_id, y = confounder, colour = significant)) +
+  geom_point(data = filter(df_adj_long, included), shape = 124, size = 3, alpha = 0.8) +
+  scale_colour_manual(
+    name = "p < 0.05", values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Yes", "FALSE" = "No")
+  ) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  scale_y_discrete(drop = FALSE) +
+  facet_grid(panel ~ ., switch = "y") +
+  theme_minimal() +
+  strip_theme_with_line +
+  theme(
+    axis.line.x.bottom = element_line("black", linewidth = 0.5),
+    axis.text.x        = element_text(size = 20, colour = "black"),  
+    axis.title.x       = element_text(size = 20, colour = "black"),  
+    plot.margin        = margin(0, 10, 5, 5),
+    plot.caption       = element_text(size = 16, colour = "black", hjust = 1),
+    legend.position    = "bottom",
+    legend.direction   = "horizontal",
+    legend.title       = element_text(size = 20),
+    legend.text        = element_text(size = 20)
+  ) +
+  labs(x = "Specification", y = NULL, caption = "DT: data type; EC: exclusion criteria; MD: missing data; SM: statistical model; \nOUT: outcome; ADJ: adjustment variable (included/excluded in the adjustment set)")
+
+p_adj <- p_adj +
+  guides(
+    colour = guide_legend(
+      override.aes = list(shape = 15, size = 6) 
+    )
+  )
+
+p_top <- ggplot(df_plot, aes(x = spec_id, y = RR, colour = significant)) +
+  geom_point(size = 0.8) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "black", linewidth = 0.3) +
+  scale_colour_manual(values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"), guide = "none") +
+  scale_y_continuous(expand = c(0.02, 0)) +
+  scale_x_continuous(limits = x_limits, expand = c(0, 0)) +
+  facet_grid(dummy ~ ., switch = "y") +
+  theme_minimal() +
+  strip_theme_with_line +
+  theme(
+    axis.text.y  = element_text(colour = "black", size = 18),
+    axis.text.x  = element_blank(),
+    panel.grid   = element_blank(),
+    plot.margin  = margin(5, 10, 0, 10)
+  ) +
+  labs(y = NULL, x = NULL)
+
+specPlot <- p_top / 
+  plot_spacer() /
+  p_middle / 
+  plot_spacer() /
+  p_outcome / 
+  plot_spacer() /
+  p_adj +
+  plot_layout(heights = c(1.5, 0.05, 3.5, 0.05, 0.8, 0.05, 1.2))
+
+ggsave(
+  here("docs/Thesis_Draft/figures/specification_curve.pdf"),
+  specPlot,
+  width  = 14,
+  height = 17
+)
+```

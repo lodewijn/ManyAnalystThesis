@@ -1,0 +1,238 @@
+---
+title: "Causal Inference Assignment - Part 2"
+author: "Paolo Colussi, Loesje Ubbink"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+
+```{r echo=F, message=FALSE}
+# Load required packages
+library(ggdag)
+library(tidyverse)
+library(dagitty)
+library(ggdag)
+library(pcalg)
+library(qgraph)
+```
+
+### 2. Use the PC-algorithm on the data your received to ‘discover’ the structure of the causal system. Exclude the dichotomized cause variable from this analysis.<br><br>
+
+First we load the data: 
+
+```{r}
+load("Kanga.Rdata")
+summary(df)
+```
+
+Then we use the pc-algorithm
+
+```{r}
+# Excluding the dichotomized cause variable
+df2 <- df %>%
+  dplyr::select(-BC_dich)
+
+# Define the structure of the data for the PC-algorithm
+suffStat <- list(C = cor(df2), # Inter-variable correlations  
+                 n = nrow(df2))
+
+# Fit the PC-algorithm
+pc_fit <- pc(suffStat = suffStat, 
+             indepTest = gaussCItest, 
+             p = ncol(df2), 
+             alpha = 0.01)
+
+# Plot the CP-DAG inferred from the PC-algorithm
+plot(pc_fit, 
+     main = "Inferred CPDAG using pcalg", 
+     labels = colnames(df2))
+```
+
+**a) Provide the CP-DAG. Discuss the main findings, e.g.: How many equivalent DAGs are there? Are there paths for which you know/do not know the direction? Are the results sensible/surprising given your common sense of the substantive topic (you are allowed but not required to back your ideas up with literature)?**
+
+```{r}
+
+# Extract the adjacency matrix of the cpdag from pc_fit1
+cpdag_mat <- as(pc_fit,"matrix")
+
+# Each row is a DAG adjacency matrix in vector form (by rows)
+res1 <- pdag2allDags(cpdag_mat)
+
+# We can get the adjacency matrix of an individual DAG using
+res1_dags <- list()
+for(i in 1:nrow(res1$dags)){
+  res1_dags[[i]] <- t(matrix(res1$dags[i,],6,6,byrow = TRUE))
+}
+# Notice we have to transpose the adjacency matrix here for qgraph!
+
+# We can plot each of these just as we did above
+par(mfrow = c(1,3))
+for(i in 1:3){
+  qgraph(res1_dags[[i]], directed = TRUE, asize = 8, vsize = 15,  labels = colnames(df2))
+}
+```
+
+There are three equivalent DAGs based on the CP-DAG that was inferred with the pc-algorithm. In these DAGs the paths between agressive behaviour (AB), body condition (BC) and testosterone levels (TL) could be directed in different ways, while the conditional independencies remain the same. In all cases, reproductive success (RS) is caused by body size (BS) and dominance status (DS), which is caused by agressive behaviour (AB) and body condition (BC). In general these causal structures make sense, although the direct connection between BS and RS was a bit surprising.
+
+**b. Select and provide the DAG you think is best from the equivalence set, that is, that you feel is most realistic/sensible given the information you received on the variables/overall context. Why do you prefer this DAG? Are there things about it that you find unrealistic?**
+
+From the three equivalent DAGs the first one makes most sense, where:
+
+* BC -> TL
+* TL -> AB 
+
+It does not seem likely that agressive behaviour causes higher testosterone levels, so it can't be the third one. Also, it is more likely that body condition influences testosterone levels, as better nutritional status and energy reserves can probably increase hormone production, while testosterone alone may not directly improve body condition. Moreover, BC also includes the age of the kangaroos, and it is not possible that TL causes the age of the animals. So this is our final DAG:
+
+```{r}
+kang <- dagify(
+  TL ~ BC,
+  AB ~ TL,
+  DS ~ AB + BC,
+  RS ~ DS + BS,
+  
+  exposure = "BC", 
+  outcome = "DS", 
+  
+   coords = list(
+     x = c(
+       BC = 1,
+       TL = 0,
+       DS = 0, 
+       AB = -1,
+       RS = 1, 
+       BS = 2),
+     y = c(
+      BC = 0,
+       TL = 0.5,
+       DS = -0.5, 
+       AB = 0,
+       RS = -1, 
+       BS = -0.5)) 
+  
+)
+
+# Plot the DAG
+ggdag_status(kang) + theme_dag()
+```
+
+
+### 3. The other pair of students has specified for you which specific causal relationship you should estimate (note: the variables chosen do not have to be causally related, if they aren’t, the true causal effect is simply zero). What were the relevant cause and effect variables they specified for you?
+
+a. Cause variable: Body Condition (BC)
+b. Outcome variable: Dominance Status (DS)
+
+### 4. Estimate the prima facie effect for the causal effect of question 3. Discuss the results.\
+
+```{r, results='markup', tidy=FALSE}
+prima_facie <- lm(DS ~ BC, data = df)
+summary(prima_facie)
+```
+
+The prima facie effect of BC on DS is 0.34. 
+
+### 5. For the causal effect of question 3…
+
+**a. Based on your selected DAG (2b), what linear regression model should be used to estimate the causal effect correctly and why?**
+
+```{r}
+# Valid adjustment sets
+adjustmentSets(kang)
+```
+
+Apart from the direct effect of BC -> DS there only is one other, indirect, effect from BC -> TL -> AB -> DS. This means there is an open chain structure. When conditioning on the mediators TL and AB, BC and DS become independent given {TL, AB}, resulting in a blocked path. This means that only marginal causal effect of BC on DS would be estimated, and not the total (direct + indirect) causal effect. Given this and the fact that there are no confounders, the prima facie lm is the correct linear model to estimate the causal effect of BC on DS.
+
+**b. Estimate the causal effect with this regression model (with your continuous cause variable). Discuss the results.**
+
+Based on the prima facie regression model, that also seems to reflect the true causal relationship, the causal effect of BC on DS is 0.34.
+
+**c. Now estimate the causal effect with the dichotomous cause variable. Discuss the results.**
+
+```{r}
+di_model <- lm(DS ~ BC_dich, data=df)
+summary(di_model)
+```
+
+The causal effect of dichotomized body condition on dominance status is 0.65. This means that kangaroos in normal/good condition (with a BC value higher than the first quartile) on average have 0.65 higher dominance status than kangaroos with poor kangaroo body condition. 
+
+**d. Reflect on the differences/similarities between the results of 4, 5b, and 5c.**
+
+Since the prima facie model was the true causal linear model, the results of 4 and 5b are the same. When using the dichotomised BC, the causal effect was almost doubled, from 0.34 to 0.65. 
+
+### 6. For the causal effect of question 3, based on your selected DAG, use either matching, inverse propensity weighting, or subclassification (your choice) to estimate the causal effect of your dichotomous cause variable on the outcome. Briefly discuss the steps you take and the results.
+
+When we calculate the propensity score of a treatment variable (which is the basis of matching, IPW, and subclassification), we use all the confounders between the treatment and the outcome. The problem is that, as mentioned earlier, there are no confounders in our DAG.
+
+We decided to perform inverse population weighting anyway to demonstrate it, using all the variables present in the DAG except the outcome. This is WRONG.
+
+The first step is to calculate the propensity scores (i.e., the probability to be in the normal/good BC group (X=1) as opposed to the poor BC group (X=0)).
+
+```{r}
+
+# Run the logistic regression analysis
+logreg <- glm(BC_dich ~ TL + AB + BS + BS + RS, 
+                    family = binomial(), data = df)
+
+# Obtain a prediction of the probability of treatment (i.e., DIET=1) 
+ps <- predict(logreg, type = "response")
+
+# Add this predicted probability to the datafile
+df$ps <- ps
+
+```
+
+```{r}
+# Load necessary libraries
+library(survey)  
+library(tableone)  
+
+# Compute inverse probability weights (IPW) based on propensity scores (ps)
+weight <- ifelse(df$BC_dich == 1, 1 / (df$ps), 1 / (1 - df$ps))
+
+# Create a survey design object with the computed weights
+weighteddata <- svydesign(ids = ~ 1, data = df, weights = ~ weight)
+
+# Create an unweighted table summarizing variables across strata of BC_dich
+table <- CreateTableOne(vars = c("TL", "AB", "BS", "RS"), strata = "BC_dich", 
+                        data = df, test = FALSE)
+
+# Create a weighted table using the IPW
+weightedtable <- svyCreateTableOne(vars = c("TL", "AB", "BS", "RS"), strata = "BC_dich", 
+                                   data = weighteddata, test = FALSE)
+
+# Print the unweighted table with standardized mean differences (SMD)
+print(table, smd = TRUE)
+
+# Print the weighted table with standardized mean differences (SMD)
+print(weightedtable, smd = TRUE)
+
+```
+
+This shows that in the pseudo-population created using IPW, the two groups no longer differ much on any of the covariates; for all of them, the standardized mean difference does not exceed the rule-of-thumb value of 0.1. This would imply that IPW is entirely successful in mimicking an RCT. (In reality it does not, because as said before, we are building the propensity scores on the wrong covariates.) Now, we proceed to calculate the average causal effect (ACE).
+
+```{r}
+model <- svyglm(DS ~ BC_dich, design = weighteddata)
+summary(model)
+confint(model)
+```
+
+The estimated ACE is 0.44, and it's significantly different from 0.
+
+### 7. What is your overall conclusion about the causal effect based on your results/reflections  from steps 2-6? 
+
+We have calculated three different ACE estimates: one using the prima facie approach, one based on a DAG-driven regression, and one using IPW. The first and second estimates coincide, as there are no confounders in the DAG. The third, however, is based on incorrect assumptions and was computed purely for demonstration purposes. Nonetheless, it is worth noting that its value is not too far from the prima facie estimate.
+
+In conclusion, we can say that the ACE is equal to 0.34.
+
+### 8. What do you take away about causal inference from this and the previous assignment (if anything)? The answer to this question will not be graded.
+
+Honestly, these two assignments have made us question how well causal inference actually works. In particular, we have serious doubts about causal discovery and the PC algorithm. If it performs so poorly with generated data and a sample size of 500 — which is not small — we wonder how it could possibly perform well in real-world scenarios, especially when the number of variables increases.
+
+That said, one positive takeaway is the importance of carefully selecting which variables to include in a model. The idea that the more, the better is not just ineffective but actually harmful. This was something we already knew, but taking this course has helped us truly understand why it matters so much.
+
+
+
+
+
+
+
+

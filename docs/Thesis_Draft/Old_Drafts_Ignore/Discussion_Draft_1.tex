@@ -1,0 +1,728 @@
+\documentclass[
+  man,
+  floatsintext,
+  longtable,
+  nolmodern,
+  notxfonts,
+  notimes,
+  colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{apa7}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{setspace}
+
+
+
+\RequirePackage{longtable}
+\RequirePackage{threeparttablex}
+
+\usepackage{framed}
+
+
+\makeatletter
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\parindent}%
+	{0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+	{-.5em}%
+	{\normalfont\normalsize\bfseries\typesectitle}}
+
+\renewcommand{\subparagraph}[1]{\@startsection{subparagraph}{5}{0.5em}%
+	{0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+	{-\z@\relax}%
+	{\normalfont\normalsize\bfseries\itshape\hspace{\parindent}{#1}\textit{\addperi}}{\relax}}
+\makeatother
+
+
+
+
+\usepackage{longtable, booktabs, multirow, multicol, colortbl, hhline, caption, array, float, xpatch}
+\usepackage{subcaption}
+
+
+\renewcommand\thesubfigure{\Alph{subfigure}}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{listings,theorems, breakable, skins}
+\usepackage{fontawesome5}
+
+\definecolor{quarto-callout-color}{HTML}{909090}
+\definecolor{quarto-callout-note-color}{HTML}{0758E5}
+\definecolor{quarto-callout-important-color}{HTML}{CC1914}
+\definecolor{quarto-callout-warning-color}{HTML}{EB9113}
+\definecolor{quarto-callout-tip-color}{HTML}{00A047}
+\definecolor{quarto-callout-caution-color}{HTML}{FC5300}
+\definecolor{quarto-callout-color-frame}{HTML}{ACACAC}
+\definecolor{quarto-callout-note-color-frame}{HTML}{4582EC}
+\definecolor{quarto-callout-important-color-frame}{HTML}{D9534F}
+\definecolor{quarto-callout-warning-color-frame}{HTML}{F0AD4E}
+\definecolor{quarto-callout-tip-color-frame}{HTML}{02B875}
+\definecolor{quarto-callout-caution-color-frame}{HTML}{FD7E14}
+
+%\newlength\Oldarrayrulewidth
+%\newlength\Oldtabcolsep
+
+
+\usepackage{hyperref}
+\usepackage[protrusion=true]{microtype}
+
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+
+
+\usepackage{newtx}
+
+\defaultfontfeatures{Scale=MatchLowercase}
+\defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+
+
+
+
+
+\title{Discussion Draft}
+
+
+\shorttitle{Discussion Draft}
+
+
+\usepackage{etoolbox}
+
+
+
+
+
+
+\author{Name}
+
+
+
+\affiliation{
+{Universiteit}}
+
+
+
+
+\leftheader{Name}
+
+
+
+\abstract{Hallo }
+
+\keywords{open science, preregistration, preregistration
+deviation, reproducibility crisis, p-hacking, simulation
+study, metascience, type I error, type II error, social
+science, psychology}
+
+\authornote{\par{\addORCIDlink{Name}{0000-0000-0000-0000}} 
+
+\par{   The author(s) declare that there were no conflicts of interest
+with respect to the authorship or the publication of this
+article.    Author roles were classified using the Contributor Role
+Taxonomy (CRediT; https://credit.niso.org/) as
+follows:  Name:   conceptualization, methodology, investigation, formal
+analysis, software, visualization, writing}
+\par{Correspondence concerning this article should be addressed to Name}
+}
+
+\makeatletter
+\let\endoldlt\endlongtable
+\def\endlongtable{
+\hline
+\endoldlt
+}
+\makeatother
+
+\urlstyle{same}
+
+
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\AtBeginDocument{\thispagestyle{empty}}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{ragged2e}
+\usepackage{booktabs}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+
+% From https://tex.stackexchange.com/a/645996/211326
+%%% apa7 doesn't want to add appendix section titles in the toc
+%%% let's make it do it
+\makeatletter
+\xpatchcmd{\appendix}
+  {\par}
+  {\addcontentsline{toc}{section}{\@currentlabelname}\par}
+  {}{}
+\makeatother
+
+%% Disable longtable counter
+%% https://tex.stackexchange.com/a/248395/211326
+
+\usepackage{etoolbox}
+
+\makeatletter
+\patchcmd{\LT@caption}
+  {\bgroup}
+  {\bgroup\global\LTpatch@captiontrue}
+  {}{}
+\patchcmd{\longtable}
+  {\par}
+  {\par\global\LTpatch@captionfalse}
+  {}{}
+\apptocmd{\endlongtable}
+  {\ifLTpatch@caption\else\addtocounter{table}{-1}\fi}
+  {}{}
+\newif\ifLTpatch@caption
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+
+
+
+\setlength\LTleft{0pt}
+
+
+
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{snugshade}\begin{singlespace}}{\end{singlespace}\end{snugshade}}\fi
+
+\setlength{\cslhangindent}{0.5in}
+
+\section{Discussion}\label{discussion}
+
+The present multiverse analysis aimed to quantify the relative
+contribution of harmful versus helpful analytical decisions to effect
+size variation for the association between marital status and
+cardiovascular events, based on the many-analyst project by Kowall et
+al. (\citeproc{ref-kowall_marital_2025}{2025}). Across 4,913
+specifications, risk ratio estimates ranged from 0.71 to 1.68, with
+79.6\% of the universes yielding significant results. Marriage was found
+to be both protective and harmful for cardiovascular health depending on
+the analytical specification. This underscores that different analytical
+pathways can lead to substantially different conclusions --- a pattern
+consistent with findings from earlier many-analyst projects
+(\citeproc{ref-bastiaansen_time_2020}{Bastiaansen et al., 2020};
+\citeproc{ref-botvinik-nezer_variability_2020}{Botvinik-Nezer et al.,
+2020}; \citeproc{ref-breznau_observing_2022}{Breznau et al., 2022};
+\citeproc{ref-gould_same_2025}{Gould et al., 2025};
+\citeproc{ref-kowall_marital_2025}{Kowall et al., 2025}; e.g.,
+\citeproc{ref-silberzahn_many_2018}{Silberzahn et al., 2018}).
+
+Although the Anderson-Darling tests showed statistically significant
+distributional differences for all decisions, indicating they were all
+sensitive, statistical model and adjustment set emerged as the most
+prominent drivers of variation in RR distributions. When applying the
+AB-framework classification, both a harmful source of
+variation---statistical model---and a helpful source---adjustment
+set---contributed meaningfully to effect size variability. All other
+decisions, despite reaching statistical significance, showed minimal
+visual distributional differences across options, suggesting their
+impact on effect size variability was small. This was reinforced by the
+descriptive plots and T.AD values, which suggest that only statistical
+model and adjustment set had meaningful impact.
+
+\subsection{Helpful Sources of
+Variation}\label{helpful-sources-of-variation}
+
+A closer examination of adjustment set sensitivity using
+Kolmogorov-Smirnov tests showed that age, sex, and not including any
+confounders were the most important drivers of distributional
+differences in the results. Age and sex showed opposing patterns:
+controlling for age attenuated the protective effect of marriage, while
+controlling for sex strengthened it. A possible explanation for this
+pattern is the distribution of these variables over the groups in the
+underlying data. Unmarried individuals were on average four years older
+and predominantly female (69\%), meaning the married and unmarried
+groups differed systematically in age and sex. Without adjustment for
+these variables, the estimated effect of marriage on cardiovascular
+events therefore reflects not only the effect of marriage itself, but
+also these compositional differences between groups. The younger average
+age of married individuals may have inflated the apparent protective
+effect of marriage, while the higher proportion of males in this group
+may have attenuated it, given that men have greater cardiovascular risk
+(\citeproc{ref-pana_sex-specific_2024}{Pana et al., 2024}).
+
+From a causal inference perspective, the inclusion of covariates shifts
+the estimation from a total effect to a direct effect
+(\citeproc{ref-rohrer_thinking_2018}{Rohrer, 2018}). Without adjustment,
+the comparison between married and unmarried individuals mixes the
+effect of marriage with differences in age and sex composition between
+the groups, rather than isolating the effect of marriage itself.
+Adjusting for age, for example, estimates the effect of marriage among
+people of the same age, and similarly for sex. The observed sensitivity
+to these covariates therefore reflects a genuine difference in what is
+being estimated, not arbitrary noise---the kind of variation the
+AB-framework would characterise as helpful.
+
+Consistent with the T.AD values, the pattern observed for the
+no-confounders condition (see fig-dens-ADJ when `none' was excluded)
+closely resembled that of the age-exclusion condition, suggesting that
+age was the most important variable affecting the decision sensitivity
+of the adjustment set. When no confounders were included, risk ratio
+estimates were lower, and when any confounder was included, the
+estimates shifted towards higher values. This supports the
+interpretation that variation in the results in this case represents
+sensitivity to the causal structure of the data.
+
+\subsection{Harmful Sources of
+Variation}\label{harmful-sources-of-variation}
+
+When looking at the harmful decisions, statistical models were the most
+important drivers of variation in the results. Especially Cox and
+log-binomial models resulted in visually different distributions of risk
+ratios (see fig-dens-plot). It is important to note that when setting up
+the multiverse, it was evident that the choice of statistical models was
+not an independent decision. For example, only three out of seven
+outcome operationalisations contained time-to-event data, and only two
+out of four data types were compatible with Cox models. Choosing this
+statistical model therefore implicitly constrained other facets of the
+analysis. Crucially, even after conversion to risk ratios, Cox models
+consistently yielded substantially higher estimates than other modelling
+approaches, although these were often non-significant. This suggests
+that model assumptions can even fundamentally alter the conclusion.
+
+Additionally, 1,102 log-binomial models failed to converge---whereas
+only 232 were successful. Non-convergence occurred most often when the
+adjustment sets increased in size, which connects to a known limitation
+of the model (\citeproc{ref-zhu_refinements_2024}{Zhu et al., 2024}).
+Log-binomial models restrict predicted disease probabilities to lie
+between zero and one, which in turn bounds the values the regression
+coefficients can take
+(\citeproc{ref-williamson_log-binomial_2013}{Williamson et al., 2013}).
+Convergence failure arises when the maximum likelihood solution sits on
+the boundary of the parameter space, when at least one combination of
+covariates results in an estimated probability of exactly one
+(\citeproc{ref-zhu_refinements_2024}{Zhu et al., 2024}). This may become
+more likely as adjustment sets grow, since larger sets may be more
+likely to produce covariate combinations that hit this boundary.
+Notably, convergence behaviour for log-binomial models may be
+software-specific
+(\citeproc{ref-williamson_log-binomial_2013}{Williamson et al., 2013}).
+In the present study, all analyses were conducted in R, so this was not
+accounted for, meaning that some of the observed non-convergence may
+reflect software choices rather than properties of the model itself.
+
+Choosing a log-binomial model is therefore not an independent analytical
+decision, as its convergence depends at least partly on size of the
+adjustment set. A similar dependency arises with GEE models, which
+cannot handle missing data and therefore force an explicit decision
+about missingness, whereas other models default to complete-case
+analysis when nothing is specified. This means that model choice in this
+case again requires choices elsewhere in the analytical pathway.
+Importantly, choices regarding missing data in itself can also have
+implications that go beyond arbitrary noise. If data are not missing at
+random, listwise deletion could result in not including a subpopulation
+with a certain characteristic in the analysis. Moreover, when
+confounders are missing not at random, causal effects are not
+identifiable (\citeproc{ref-yang_causal_2019}{Yang et al., 2019}).
+
+Taken together, these examples reveal a fundamental limitation of the
+AB-framework: analytical decisions do not exist in isolation, so
+categorising them as such is problematic. Decisions about statistical
+models are entangled with data structure requirements, missing data
+handling and variable operationalisation. This means that many harmful
+decisions may in fact carry substantive assumptions that cannot be
+separated from potential arbitrary variation the framework was designed
+to identify.
+
+\subsection{Comparison With Original Many-Analyst
+Study}\label{comparison-with-original-many-analyst-study}
+
+The range of effect sizes found in this study was broadly in line with
+that of the original many-analyst project by Kowall et al.
+(\citeproc{ref-kowall_marital_2025}{2025}), where effect sizes ranged
+from 0.72 (OR) to 1.31 (HR). After applying the risk ratio conversions
+used in the present study, the original effect sizes would correspond to
+a range of approximately 0.85 to 1.21, indicating the original study
+captured a slightly narrower range than the present multiverse. This is
+not surprising, as the original study only included sixteen analyses,
+compared to 4,913 analyses.
+
+Despite the overlap in effect size ranges, the two studies diverged in
+identifying the main sources of variability. In contrast to the current
+study, Kowall et al. (\citeproc{ref-kowall_marital_2025}{2025})
+identified the data type (cross-sectional versus longitudinal) as the
+main source of variation, with statistical model and the adjustment set
+playing only a minor role---the opposite of the present findings. This
+inconsistency could reflect a fundamental difference between the two
+approaches. Whereas Kowall et al.
+(\citeproc{ref-kowall_marital_2025}{2025}) varied one decision at a time
+under a fixed configuration, this multiverse analysis combined all
+decisions simultaneously and captured their combined influence across
+the entire decision space.
+
+Another potential explanation for the discrepancy between studies is the
+finding that adjustment set sensitivity was driven primarily by age and
+sex. In Kowall et al. (\citeproc{ref-kowall_marital_2025}{2025}), twelve
+out of sixteen researchers included both age and sex in their analyses,
+and the additional sensitivity analyses also held these variables
+constant. Most researchers in the original study thus estimated the
+direct effect of marriage on cardiovascular events, leaving little data
+available about the effect of not including these confounders. This may
+potentially have attenuated the observed sensitivity to adjustment set
+decisions.
+
+Rather than contradicting the original study, the present findings
+extend it. When analytical decisions are varied jointly, rather than in
+isolation, this can provide a different assessment of decision
+sensitivity.
+
+\subsection{Limitations}\label{limitations}
+
+A first limitation concerns the inferential method used to assess
+decision sensitivity. The k-sample Anderson-Darling test proved to be
+sensitive to sample size . With 4,913 specifications, even minimal
+distributional differences resulted in significant results. The
+universal significance across all decisions therefore likely reflects
+the number of specifications rather than substantive distributional
+differences. While the AD test yielded a useful measure of
+between-decision sensitivity, combining it with descriptive methods
+rather than relying on p-values alone would provide a more informative
+picture of decision sensitivity. Moreover, future research should
+explore inferential methods that are less susceptible to the large
+sample sizes characteristic of multiverse analyses, and explicitly
+account for the dependency structure between decisions and
+specifications.
+
+A second limitation is the generalisability of the results of the
+multiverse study. The relative contribution of harmful versus helpful
+analytical decisions will likely vary across studies, given the wide
+variety of topics and research questions across many-analyst projects
+(\citeproc{ref-gould_same_2025}{Gould et al., 2025};
+\citeproc{ref-hoogeveen_many-analysts_2023}{Hoogeveen et al., 2023};
+\citeproc{ref-kowall_marital_2025}{Kowall et al., 2025}; e.g.,
+\citeproc{ref-silberzahn_many_2018}{Silberzahn et al., 2018}). It does
+not seem realistic to expect that the results of this study directly
+apply to other projects. The decisions that proved to be most
+influential here---statistical model and adjustment set---are not
+necessarily the main sources of variation in other contexts, or even in
+the same context when decisions are varied one at a time rather than
+jointly, as the comparison with Kowall et al.
+(\citeproc{ref-kowall_marital_2025}{2025}) illustrates. Replicating this
+multiverse analysis across different many-analyst projects, preferably
+with a wide range of research questions and data structures, might
+reveal more general patterns in decision sensitivity. However, assuming
+that such patterns exist may perhaps already be too bold.
+
+Another limitation is the conversion of effect sizes. While this has
+benefits for comparability across statistical models, the converged risk
+ratios are always an approximation. According to VanderWeele
+(\citeproc{ref-vanderweele_optimal_2020}{2020}), the square root
+transformation of the odds ratio gives a reasonably good approximation
+and differs from the true risk ratio by at most 25\%, when the
+prevalence lies within 20\%--80\%. In case of hazard ratios, the
+conversion will place the value within 16\% of the true risk ratios when
+the prevalence lies within 20\%--80\%, and 45\% of the risk ratio if the
+prevalence is between 10\%--90\%, which is the case in the present
+study. This highlights that even though converting effect sizes can have
+benefits for inter-model comparisons, at the same time this may have
+introduced, or reduced, arbitrary variance in the results.
+
+\subsection{Future Recommendations}\label{future-recommendations}
+
+The current findings raise a broader question: what should analysts do
+when analytical choices can fundamentally alter the conclusions of their
+research? Multiverse analysis cannot determine which specification is
+``correct'', and the present study showed that substantial variability
+in effect estimates was found even within multiple defensible analytical
+paths. To ensure that the effects of analytical variability can be
+assessed properly, it is recommended to perform multiverse analysis, not
+only as a measure of robustness, but also as a transparent
+representation of the space of plausible conclusions
+(\citeproc{ref-botvinik-nezer_variability_2020}{Botvinik-Nezer et al.,
+2020}).
+
+Future research should explore inferential methods to quantify decision
+sensitivity that are more suitable and robust to the large samples in
+multiverse analysis. Additionally, extending these methods to allow the
+derivation of a unique result that integrates all uncertain decisions
+remains an open area of research
+(\citeproc{ref-aczel_consensus-based_2021}{Aczel et al., 2021}). In
+addition to developing new methods, researchers should emphasize ground
+their decisions in theory and causal reasoning rather than idiosyncratic
+choices. Notably, only three of the sixteen teams in Kowall et al.
+(\citeproc{ref-kowall_marital_2025}{2025}) used directed acyclic graphs
+(DAGs), and even those differed significantly. Specifying analytical
+decisions in pre-registrations, constructing DAGs before starting the
+analysis, and making causal assumptions explicit could help reduce
+researchers' unknown degrees of freedom
+(\citeproc{ref-botvinik-nezer_variability_2020}{Botvinik-Nezer et al.,
+2020}). In combination with the openly sharing data and code, this would
+not eliminate analytical variability, but would ensure that its effects
+can be assessed in a transparent manner to meaningfully interpret
+variation in the results and associated substantive conclusions.
+
+\newpage
+
+\section{References}\label{references}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-aczel_consensus-based_2021}
+Aczel, B., Szaszi, B., Nilsonne, G., Van Den Akker, O. R., Albers, C.
+J., Van Assen, M. A., Bastiaansen, J. A., Benjamin, D., Boehm, U.,
+Botvinik-Nezer, R., Bringmann, L. F., Busch, N. A., Caruyer, E.,
+Cataldo, A. M., Cowan, N., Delios, A., Van Dongen, N. N., Donkin, C.,
+Van Doorn, J. B., \ldots{} Wagenmakers, E.-J. (2021). Consensus-based
+guidance for conducting and reporting multi-analyst studies.
+\emph{eLife}, \emph{10}, e72185.
+\url{https://doi.org/10.7554/eLife.72185}
+
+\bibitem[\citeproctext]{ref-bastiaansen_time_2020}
+Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F. J., Boker, S. M.,
+Ceulemans, E., Chen, M., Chow, S.-M., De Jonge, P., Emerencia, A. C.,
+Epskamp, S., Fisher, A. J., Hamaker, E. L., Kuppens, P., Lutz, W.,
+Meyer, M. J., Moulder, R., Oravecz, Z., Riese, H., Rubel, J., \ldots{}
+Bringmann, L. F. (2020). Time to get personal? {The} impact of
+researchers choices on the selection of treatment targets using the
+experience sampling methodology. \emph{Journal of Psychosomatic
+Research}, \emph{137}, 110211.
+\url{https://doi.org/10.1016/j.jpsychores.2020.110211}
+
+\bibitem[\citeproctext]{ref-botvinik-nezer_variability_2020}
+Botvinik-Nezer, R., Holzmeister, F., Camerer, C. F., Dreber, A., Huber,
+J., Johannesson, M., Kirchler, M., Iwanir, R., Mumford, J. A., Adcock,
+R. A., Avesani, P., Baczkowski, B. M., Bajracharya, A., Bakst, L., Ball,
+S., Barilari, M., Bault, N., Beaton, D., Beitner, J., \ldots{}
+Schonberg, T. (2020). Variability in the analysis of a single
+neuroimaging dataset by many teams. \emph{Nature}, \emph{582}(7810),
+84--88. \url{https://doi.org/10.1038/s41586-020-2314-9}
+
+\bibitem[\citeproctext]{ref-breznau_observing_2022}
+Breznau, N., Rinke, E. M., Wuttke, A., Nguyen, H. H. V., Adem, M.,
+Adriaans, J., Alvarez-Benjumea, A., Andersen, H. K., Auer, D., Azevedo,
+F., Bahnsen, O., Balzer, D., Bauer, G., Bauer, P. C., Baumann, M.,
+Baute, S., Benoit, V., Bernauer, J., Berning, C., \ldots{} Żółtak, T.
+(2022). Observing many researchers using the same data and hypothesis
+reveals a hidden universe of uncertainty. \emph{Proceedings of the
+National Academy of Sciences}, \emph{119}(44), e2203150119.
+\url{https://doi.org/10.1073/pnas.2203150119}
+
+\bibitem[\citeproctext]{ref-gould_same_2025}
+Gould, E., Fraser, H. S., Parker, T. H., Nakagawa, S., Griffith, S. C.,
+Vesk, P. A., Fidler, F., Hamilton, D. G., Abbey-Lee, R. N., Abbott, J.
+K., Aguirre, L. A., Alcaraz, C., Aloni, I., Altschul, D., Arekar, K.,
+Atkins, J. W., Atkinson, J., Baker, C. M., Barrett, M., \ldots{}
+Zitomer, R. A. (2025). Same data, different analysts: Variation in
+effect sizes due to analytical decisions in ecology and evolutionary
+biology. \emph{BMC Biology}, \emph{23}(1), 35.
+\url{https://doi.org/10.1186/s12915-024-02101-x}
+
+\bibitem[\citeproctext]{ref-hoogeveen_many-analysts_2023}
+Hoogeveen, S., Sarafoglou, A., Aczel, B., Aditya, Y., Alayan, A. J.,
+Allen, P. J., Altay, S., Alzahawi, S., Amir, Y., Anthony, F.-V., Kwame
+Appiah, O., Atkinson, Q. D., Baimel, A., Balkaya-Ince, M., Balsamo, M.,
+Banker, S., Bartoš, F., Becerra, M., Beffara, B., \ldots{} Wagenmakers,
+E.-J. (2023). A many-analysts approach to the relation between
+religiosity and well-being. \emph{Religion, Brain \& Behavior},
+\emph{13}(3), 237--283.
+\url{https://doi.org/10.1080/2153599X.2022.2070255}
+
+\bibitem[\citeproctext]{ref-kowall_marital_2025}
+Kowall, B., Ahrenfeldt, L. J., Basten, J., Becher, H., Brand, T., Braun,
+J., Casjens, S., Claessen, H., Denz, R., Diebner, H. H., Diexer, S.,
+Eisemann, N., Furrer, E., Galetzka, W., Girschik, C., Karch, A.,
+Mikolajczyk, R., Peters, M., Rospleszcz, S., \ldots{} Rübsamen, N.
+(2025). Marital status and risk of cardiovascular disease -- a
+multi-analyst study in epidemiology. \emph{European Journal of
+Epidemiology}, \emph{40}(5), 497--509.
+\url{https://doi.org/10.1007/s10654-025-01235-8}
+
+\bibitem[\citeproctext]{ref-pana_sex-specific_2024}
+Pana, T. A., Mamas, M. A., Wareham, N. J., Khaw, K.-T., Dawson, D. K.,
+\& Myint, P. K. (2024). Sex-specific lifetime risk of cardiovascular
+events: The {European} {Prospective} {Investigation} into
+{Cancer}-{Norfolk} prospective population cohort study. \emph{European
+Journal of Preventive Cardiology}, \emph{31}(2), 230--241.
+\url{https://doi.org/10.1093/eurjpc/zwad283}
+
+\bibitem[\citeproctext]{ref-rohrer_thinking_2018}
+Rohrer, J. M. (2018). Thinking {Clearly} {About} {Correlations} and
+{Causation}: {Graphical} {Causal} {Models} for {Observational} {Data}.
+\emph{Advances in Methods and Practices in Psychological Science},
+\emph{1}(1), 27--42. \url{https://doi.org/10.1177/2515245917745629}
+
+\bibitem[\citeproctext]{ref-silberzahn_many_2018}
+Silberzahn, R., Uhlmann, E. L., Martin, D. P., Anselmi, P., Aust, F.,
+Awtrey, E., Bahník, Š., Bai, F., Bannard, C., Bonnier, E., Carlsson, R.,
+Cheung, F., Christensen, G., Clay, R., Craig, M. A., Dalla Rosa, A.,
+Dam, L., Evans, M. H., Flores Cervantes, I., \ldots{} Nosek, B. A.
+(2018). Many {Analysts}, {One} {Data} {Set}: {Making} {Transparent}
+{How} {Variations} in {Analytic} {Choices} {Affect} {Results}.
+\emph{Advances in Methods and Practices in Psychological Science},
+\emph{1}(3), 337--356. \url{https://doi.org/10.1177/2515245917747646}
+
+\bibitem[\citeproctext]{ref-vanderweele_optimal_2020}
+VanderWeele, T. J. (2020). Optimal approximate conversions of odds
+ratios and hazard ratios to risk ratios. \emph{Biometrics},
+\emph{76}(3), 746--752. \url{https://doi.org/10.1111/biom.13197}
+
+\bibitem[\citeproctext]{ref-williamson_log-binomial_2013}
+Williamson, T., Eliasziw, M., \& Fick, G. H. (2013). Log-binomial
+models: Exploring failed convergence. \emph{Emerging Themes in
+Epidemiology}, \emph{10}, 14.
+\url{https://doi.org/10.1186/1742-7622-10-14}
+
+\bibitem[\citeproctext]{ref-yang_causal_2019}
+Yang, S., Wang, L., \& Ding, P. (2019). Causal inference with
+confounders missing not at random. \emph{Biometrika}, \emph{106}(4),
+875--888. \url{https://doi.org/10.1093/biomet/asz048}
+
+\bibitem[\citeproctext]{ref-zhu_refinements_2024}
+Zhu, C., Hosmer, D. W., Stankovich, J., Wills, K., \& Blizzard, L.
+(2024). Refinements on the exact method to solve the numerical
+difficulties in fitting the log binomial regression model for estimating
+relative risk. \emph{Communications in Statistics - Theory and Methods},
+\emph{53}(23), 8359--8375.
+\url{https://doi.org/10.1080/03610926.2023.2284674}
+
+\end{CSLReferences}
+
+\begin{verbatim}
+# A tibble: 89 x 7
+   Decision          Option        N_valid N_failed `Mean RR` `RR Range` `% Sig`
+   <chr>             <chr>           <int>    <int>     <dbl> <chr>      <chr>  
+ 1 Statistical Model Log-binomial      232     1102      0.83 [0.71, 0.~ 100%   
+ 2 Statistical Model Mixed effect~    1278        0      0.92 [0.73, 1.~ 77%    
+ 3 Statistical Model Discrete-tim~     832        0      0.92 [0.76, 1.~ 74%    
+ 4 Statistical Model GEE              1052      221      0.95 [0.8, 1.0~ 85%    
+ 5 Statistical Model Logistic reg~    1188      164      0.95 [0.8, 1.1~ 93%    
+ 6 Statistical Model Cox PH            331        0      1.08 [0.84, 1.~ 24%    
+ 7 Data Type         Cross-sectio~    1237      403      0.93 [0.74, 1.~ 91%    
+ 8 Data Type         Longitudinal~    1669      563      0.93 [0.71, 1.~ 69%    
+ 9 Data Type         Longitudinal~    1869      411      0.95 [0.75, 1.~ 82%    
+10 Data Type         Cross-sectio~     138      110      0.97 [0.77, 1.~ 86%    
+# i 79 more rows
+\end{verbatim}
+
+
+
+
+
+
+\end{document}

@@ -1,0 +1,401 @@
+---
+title: "Results Draft 2"
+author: Loesje Ubbink
+date: today
+date-format: "D/M/YYYY"
+format:
+  pdf:
+    keep-tex: false
+    header-includes:
+      - \usepackage{float}
+      - \floatplacement{figure}{H}
+number-sections: true
+csl: apa.csl
+---
+
+```{r setup, echo = F, include = F, warning = F, message = F}
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(kSamples)
+library(tibble)
+library(kableExtra)
+library(stats)
+
+decision_space_raw <- read_csv(here("data/decision_space/decision_space_raw.csv"))
+decision_space <- read_csv(here("data/decision_space/decision_space.csv"))
+sampled_universes <- readRDS(here("data/sampled_universes/sampled_universes_100.RDS"))
+results <- readRDS(here("data/results/corrected_results_final_2026-04-28.RDS"))
+
+# Make sure all NAs are seen as NAs
+results <- results %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+
+# How are NAs distributed per statistical model?
+NAperModel <- results %>%
+  group_by(model_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+descRR <- results |>
+  filter(!is.na(RR)) |>
+  summarise(min = round(min(RR), 2),
+    max = round(max(RR), 2),
+    percSig = sum(p.value < 0.05)/nrow(results) * 100,
+    median = round(median(RR), 2),
+    mean = round(mean(RR), 2),
+    sd = round(sd(RR), 2))
+
+converged_results <- nrow(sampled_universes) - sum(is.na(results$RR))
+```
+
+# Results
+
+## Model convergence
+Out of the `r format(nrow(sampled_universes), big.mark = ",")` sampled universes, `r format(sum(is.na(results$RR)), big.mark = ",")` failed to converge. Non-convergence mostly occurred in log-binomial models (n = `r format(NAperModel$na_count[NAperModel$model_type == "log-binom"], big.mark = ",")`), followed by generalised estimating equations (GEE; n = `r format(NAperModel$na_count[NAperModel$model_type == "GEE"], big.mark = ",")`) and logistic regression (n = `r format(NAperModel$na_count[NAperModel$model_type == "log_reg"], big.mark = ",")`). The other three model types (Cox PH, mixed effects logistic, and discrete-time mixed effects) converged successfully in all cases. Across other analytical decisions, non-convergence was distributed approximately equally, suggesting these decisions did not substantially affect model convergence. In total, `r format(converged_results, big.mark = ",")` universes yielded valid risk ratio estimates. The number of converged and non-converged universes per decision option can be found in @tbl-RRfulltable.
+
+## Overall multiverse results
+Across the `r format(converged_results, big.mark = ",")` successful specifications, risk ratio estimates ranged from `r descRR$min` to `r descRR$max` (median = `r descRR$median`, mean = `r descRR$mean`, SD = `r descRR$sd`), with `r round(descRR$percSig, 1)`% of the universes yielding significant results (p < .05). Within this sample of the full multiverse, marriage thus appeared both as a protective factor (RR < 1) and a risk factor (RR > 1) for cardiovascular events, depending on the analytical specification. @fig-spec-curve shows the full distribution of the effect estimates across universes, arranged from smallest to largest risk ratio, with significance indicated by colour.
+
+Several patterns emerged in the specification curve (@fig-spec-curve). Universes including age as an adjustment variable were clustered around higher RRs (mostly $\geq 1$), while universes without age were clustered around lower RRs (all < 1), suggesting a potential effect of age on the relationship between marriage and cardiovascular events. The highest RRs (> 1.25) only occurred in specifications including Cox PH models, although almost none of these estimates reached significance. Log-binomial models, in contrast, yielded only RRs below 1, almost all of which were significant. Furthermore, effect estimates seemed robust to data type (except cross-sectional W1), missing data handling, outcomes (except Age + Ever), and exclusion criteria, with no clear clustering patterns across these decisions.
+
+```{r spec curve}
+#| label: fig-spec-curve
+#| fig-cap: "Specification curve multiverse results"
+#| echo: false
+#| fig-align: "left"
+#| out-width: "180%"
+#| fig-pos: "H"
+
+knitr::include_graphics("specification_curve.pdf")
+```
+```{r density plot}
+#| label: fig-dens-plot
+#| fig-cap: "Densities of risk ratios (RR) across decisions and their options."
+#| echo: false
+#| out-width: "100%"
+#| fig-align: "left"
+#| fig-pos: "H"
+
+knitr::include_graphics("density_plot.png")
+```
+
+## Decision sensitivity
+```{r ad setup, echo = F, include = F, warning = F, message = F}
+set.seed(260722)
+DT_AD <- ad.test(RR ~ data_type, data = results)
+MD_AD <- ad.test(RR ~ missing_data, data = results)
+EC_AD <- ad.test(RR ~ exclusion, data = results)
+OUT_AD <- ad.test(RR ~ outcome_label, data = results)
+ADJ_AD <- ad.test(RR ~ adjustment_label, data = results)
+SM_AD <- ad.test(RR ~ model_type, data = results)
+
+ADtable <- tibble(
+  Decision = c("Data Type", "Missing Data", "Exclusion Criteria", 
+               "Outcome", "Statistical Model", "Adjustment Set"), 
+  `N options` = c(DT_AD$k, MD_AD$k, EC_AD$k, OUT_AD$k, SM_AD$k, ADJ_AD$k),
+  T.AD = c(DT_AD$ad[1,2], MD_AD$ad[1,2], EC_AD$ad[1,2], 
+             OUT_AD$ad[1,2], SM_AD$ad[1,2], ADJ_AD$ad[1,2]),
+  p_value = c(DT_AD$ad[1,3], MD_AD$ad[1,3], EC_AD$ad[1,3], 
+                OUT_AD$ad[1,3], SM_AD$ad[1,3], ADJ_AD$ad[1,3])
+) |>
+  arrange(T.AD)
+```
+```{r full RR table setup, echo = F, include = F, warning = F, message =F}
+decisions <- c("model_type", "data_type", "missing_data", "exclusion", "outcome_label", "adjustment_label")
+
+# Create label mappings
+decision_labels <- c(
+  "data_type" = "Data Type",
+  "missing_data" = "Missing Data",
+  "exclusion" = "Exclusion Criteria",
+  "outcome_label" = "Outcome",
+  "model_type" = "Statistical Model",
+  "adjustment_label" = "Adjustment Set"
+)
+
+option_labels <- c(
+  # Data type
+  "cross_all" = "Cross-sectional (all waves)",
+  "cross_w1" = "Cross-sectional (wave 1)",
+  "long_nostrict" = "Longitudinal (no strict baseline)",
+  "long_w1" = "Longitudinal (wave 1)",
+  
+  # Missing data
+  "cc" = "Complete cases",
+  "ni" = "No information",
+  
+  # Exclusion
+  "born_after1954" = "Born after 1954",
+  "country" = "Country",
+  "divorced_widowed" = "Divorced/widowed",
+  "married_before18" = "Married before 18",
+  "none" = "None",
+  "younger_than_55_w1" = "Younger than 55",
+  
+  # Model type
+  "cox_haz" = "Cox PH",
+  "log_reg" = "Logistic regression",
+  "log-binom" = "Log-binomial",
+  "mix_log_reg" = "Mixed effects logistic regression",
+  "time_mix" = "Discrete-time mixed effects",
+  "GEE" = "GEE"
+)
+
+# Create table with nice labels
+full_table <- map_dfr(decisions, function(d) {
+  results %>%
+    group_by(Option = .data[[d]]) %>%
+    summarise(
+      N_total = n(),
+      N_failed = sum(is.na(RR)),
+      N_valid = sum(!is.na(RR)),
+      `Mean RR` = round(mean(RR, na.rm = TRUE), 2),
+      `RR Range` = paste0("[", round(min(RR, na.rm = TRUE), 2), ", ", round(max(RR, na.rm = TRUE), 2), "]"),
+      `% Sig` = paste0(round(mean(p.value < 0.05, na.rm = TRUE) * 100, 0), "%"),
+      .groups = "drop"
+    ) %>%
+    arrange(`Mean RR`) %>%
+    mutate(
+      Decision = decision_labels[d],
+      Option = ifelse(Option %in% names(option_labels), option_labels[Option], Option)
+    ) %>%
+    select(Decision, Option, N_valid, N_failed, `Mean RR`, `RR Range`, `% Sig`)
+})
+
+# Clean adjustment labels in the data first
+full_table <- full_table %>%
+  mutate(
+    Option = Option %>%
+      str_replace_all("dn010_", "Edu") %>%
+      str_replace_all("dn042_", "Sex") %>%
+      str_replace_all("br001_", "Smoke") %>%
+      str_replace_all("phactiv", "Phys") %>%
+      str_replace_all("country", "Country") %>%
+      str_replace_all("age_int", "Age") %>%
+      str_replace_all("none", "None") %>%
+      str_replace_all("since_last_int", "Since") |>
+      str_replace_all("age_at_event", "Age event") %>%
+      str_replace_all("death_by_event", "Death") %>%
+      str_replace_all("event_ever", "Event ever") %>%
+      str_replace_all("\\+", " + ")
+  )
+
+summary_full_table <- full_table %>%
+    group_by(Decision) %>%
+    summarise(
+      min = round(min(`Mean RR`), 2),
+      max = round(max(`Mean RR`), 2),   
+      range = abs(round(min(`Mean RR`) - max(`Mean RR`),2)),
+      .groups = "drop"
+    ) |>
+  arrange(range)
+```
+```{r KS test setup, echo = F, include = F, warning = F, message = F}
+df_adj <- results %>%
+  filter(!is.na(RR)) |>
+  mutate(
+    has_none = grepl("none", adjustment_label, ignore.case = TRUE),
+    has_age = grepl("age_int", adjustment_label, ignore.case = TRUE),
+    has_sex = grepl("dn042_", adjustment_label, ignore.case = TRUE),
+    has_country = grepl("country", adjustment_label, ignore.case = TRUE),
+    has_smoking = grepl("br001_", adjustment_label, ignore.case = TRUE),
+    has_education = grepl("dn010_", adjustment_label, ignore.case = TRUE),
+    has_activity = grepl("phactiv", adjustment_label, ignore.case = TRUE)
+  )
+
+# KS test for each confounder
+ks_none <- ks.test(df_adj$RR[df_adj$has_none], df_adj$RR[!df_adj$has_none])
+ks_age <- ks.test(df_adj$RR[df_adj$has_age], df_adj$RR[!df_adj$has_age])
+ks_sex <- ks.test(df_adj$RR[df_adj$has_sex], df_adj$RR[!df_adj$has_sex])
+ks_country <- ks.test(df_adj$RR[df_adj$has_country], df_adj$RR[!df_adj$has_country])
+ks_smoking <- ks.test(df_adj$RR[df_adj$has_smoking], df_adj$RR[!df_adj$has_smoking])
+ks_education <- ks.test(df_adj$RR[df_adj$has_education], df_adj$RR[!df_adj$has_education])
+ks_activity <- ks.test(df_adj$RR[df_adj$has_activity], df_adj$RR[!df_adj$has_activity])
+
+# Combine results
+ks_results <- data.frame(
+  `Adjustment variable` = c("None", "Age", "Sex", "Country", "Smoking", "Education", "Physical activity"),
+  Included = c(sum(df_adj$has_none), sum(df_adj$has_age), sum(df_adj$has_sex), 
+               sum(df_adj$has_country), sum(df_adj$has_smoking), sum(df_adj$has_education), 
+               sum(df_adj$has_activity)),
+  Excluded = c(sum(!df_adj$has_none), sum(!df_adj$has_age), sum(!df_adj$has_sex), 
+               sum(!df_adj$has_country), sum(!df_adj$has_smoking), sum(!df_adj$has_education), 
+               sum(!df_adj$has_activity)),
+  D = c(ks_none$statistic, ks_age$statistic, ks_sex$statistic, ks_country$statistic, 
+        ks_smoking$statistic, ks_education$statistic, ks_activity$statistic),
+  p.value = c(ks_none$p.value, ks_age$p.value, ks_sex$p.value, ks_country$p.value,
+        ks_smoking$p.value, ks_education$p.value, ks_activity$p.value), 
+  check.names = F
+)
+
+ks_results$D <- round(ks_results$D, 3)
+ks_results$p.value <- ifelse(ks_results$p.value < 0.001, "< .001", round(ks_results$p.value, 3))
+
+ks_results <- ks_results |>
+  arrange(D)
+```
+```{r age and sex across groups, echo = F, include = F, warning = F, message = F}
+df <- readRDS(here("data/cleandata/df_all_waves.RDS"))
+source(here("scripts/04_set_up_multiverse/03_exposure_function.R"))
+df <- exposure_function(df)
+
+descSHARE <- df |>
+  group_by(exposure) |>
+  summarise(meanAGE = mean(age_int, na.rm=T), 
+            NMale = sum(ifelse(dn042_ == "Male", 1, 0)),
+            NFemale = sum(ifelse(dn042_ == "Female", 1, 0)), 
+            pctFemale = mean(dn042_ == "Female", na.rm = TRUE) * 100)
+```
+
+To examine the effect size distributions across decision options in more detail, density plots were used (see @fig-dens-plot). Data type, missing data, exclusion criteria, and outcome showed largely overlapping RR distributions across their options. However, in case of statistical models and adjustment sets there were clear separations in RR distributions between options. Consistent with the pattern shown in @fig-spec-curve, log-binomial models were clustered below RR values of 1, while the density of Cox PH showed a long tail extending above 1. Similarly, specifications including age in the adjustment set showed a clear shift towards higher RRs compared to those without age as a confounder.
+
+Mean RR ranges across options confirmed the patterns found in the specification curve and density plots (@tbl-RRfulltable). Statistical model (`r summary_full_table$min[6]` - `r summary_full_table$max[6]`) and adjustment set (`r summary_full_table$min[5]` - `r summary_full_table$max[5]`) showed the largest variation in mean RR across options, while other decisions showed smaller ranges: exclusion criteria (`r summary_full_table$min[1]` - `r summary_full_table$max[1]`), missing data (`r summary_full_table$min[2]` - `r summary_full_table$max[2]`), data type (`r summary_full_table$min[3]` - `r summary_full_table$max[3]`), and outcome (`r summary_full_table$min[4]` - `r summary_full_table$max[4]`).
+
+A k-sample Anderson-Darling test (AD test) was used to quantify decision sensitivity (for the ECDF per decision see @fig-ECDF). As shown in @tbl-ADtest, AD tests for all decisions were highly significant (almost all p < .001), indicating distributional differences across options within each decision. Adjustment set and statistical model showed substantially higher T.AD values (`r round(ADtable$T.AD[5], 2)` and `r round(ADtable$T.AD[6],2)`, respectively) than other decisions (missing data: `r round(ADtable$T.AD[1], 2)`; exclusion: `r round(ADtable$T.AD[2], 2)`; outcome: `r round(ADtable$T.AD[3], 2)`; data type: `r round(ADtable$T.AD[4], 2)`). This indicates that statistical model and adjustment set had the largest impact on the distribution of effect estimates. The number of options per decision did not seem to substantially affect the T.AD values.
+
+```{r AD test table}
+#| label: tbl-ADtest
+#| tbl-cap: "K-sample Anderson-Darling tests for distributional differences across analytical decision options, with higher standardised AD values indicating more sensitive decisions."
+#| warning: false
+#| include: true
+#| echo: false
+
+ADtable <- ADtable %>%
+  mutate(
+    p_value = case_when(
+      p_value < 0.001 ~ "< .001",
+      TRUE ~ paste0(round(p_value, 3))
+    )
+  )
+
+ADtable %>%
+  kbl(
+    booktabs = TRUE,
+    linesep = "\\addlinespace",
+    digits = 2,
+    align = c("l", "c", "r", "r"),
+    col.names = c("Decision", "k", "T.AD", "p-value")
+  ) %>%
+  kable_styling(
+    position = "left",
+    font_size = 11,
+    latex_options = "hold_position"
+  ) %>%
+  column_spec(1, width = "4cm") %>%
+  column_spec(2, width = "2cm") %>%
+  column_spec(3, width = "2cm") %>%
+  column_spec(4, width = "2cm") %>%
+  footnote(
+    general = "\\\\small k = number of options; T.AD = standardised AD value.",
+    general_title = "\\\\small \\\\textit{Note}. ",
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE,
+    escape = FALSE
+  )
+```
+
+Kolmogorov-Smirnov tests (KS test) were used to compare RR distributions for specifications including versus excluding each adjustment variable. For the ECDFs across adjustment variables, see @fig-ECDF-ADJ. As can be seen in @tbl-KStest, inclusion of all adjustment variables, except smoking, resulted in significantly different distributions than when these variables were excluded (p < .001). Age showed the largest effect (`r round(ks_results$D[7],2)`), followed by not including any confounders (`r round(ks_results$D[6],2)`) and sex (`r round(ks_results$D[5],2)`). Physical activity, country, and education showed moderate, but significant, effects ($D_{activity}$ = `r round(ks_results$D[4],2)`, $D_{country}$ = `r round(ks_results$D[3],2)`, and $D_{education}$ = `r round(ks_results$D[2],2)`). This confirms that the adjustment set sensitivity seems to be driven primarily by age, sex and the decision not to include confounders at all.
+
+```{r KS test table}
+#| label: tbl-KStest
+#| tbl-cap: "Kolmogorov–Smirnov test for distributional differences across adjustment set options, when including or excluding specific adjustment variables. D: absolute max distance between the ECDFs of the two samples."
+#| warning: false
+#| include: true
+#| echo: false
+#| tbl-pos: "H"
+
+ks_results %>%
+  kbl(
+    booktabs = TRUE,
+    linesep = "\\addlinespace",
+    digits = 2,
+    align = c("l", "c", "c", "c", "r"),
+    col.names = c("Adjustment variable", "Included", "Excluded", "D", "p-value")
+  ) %>%
+  kable_styling(
+    position = "left",
+    font_size = 11,
+    latex_options = "hold_position"
+  ) %>%
+  column_spec(1, width = "4cm") %>%
+  column_spec(2, width = "2cm") %>%
+  column_spec(3, width = "2cm") %>%
+  footnote(
+    general = "\\\\small D = KS test statistic (range: 0 - 1), smaller numbers indicate smaller distributional differences.",
+    general_title = "\\\\small \\\\textit{Note}. ",
+    threeparttable = TRUE,
+    footnote_as_chunk = TRUE,
+    escape = FALSE
+  )
+```
+
+The adjustment set sensitivity driven by age, sex and none is also visible in the RR density distributions (@fig-dens-ADJ). Including age as an adjustment variable shifted the RR distribution to the right (higher RRs), while including sex shifted it to the left (lower RRs). Specifications without any confounders also showed lower RRs. Other adjustment variables did not result in pronounced differences between RR distributions.
+
+In the underlying data, married individuals were on average `r abs(round(descSHARE$meanAGE[descSHARE$exposure == 1] - descSHARE$meanAGE[descSHARE$exposure == 0],0))` years younger than unmarried individuals (`r round(descSHARE$meanAGE[descSHARE$exposure == 1],0)` versus `r round(descSHARE$meanAGE[descSHARE$exposure == 0],0)` years old). Additionally, the distribution of sex differed between groups: `r round(descSHARE$pctFemale[descSHARE$exposure == 1], 0)`% of married individuals were female, compared to `r round(descSHARE$pctFemale[descSHARE$exposure == 0], 0)`% in the unmarried group.
+
+```{r density plot per confounder}
+#| label: fig-dens-ADJ
+#| fig-cap: "Densities of risk ratios (RR) across inclusion/exclusion of different adjustment variables."
+#| echo: false
+#| out-width: "100%"
+#| fig-align: "left"
+#| fig-pos: "H"
+
+knitr::include_graphics("dens_per_confounder.png")
+```
+
+# Appendix {#sec-appendix .appendix}
+
+```{r ECDF plot}
+#| label: fig-ECDF
+#| fig-cap: "Empirical cumulative distribution functions of risk ratios (RR) across decisions and their options."
+#| echo: false
+#| out-width: "100%"
+#| fig-align: "left"
+#| fig-pos: "H"
+
+knitr::include_graphics("ECDF_plot.png")
+```
+
+```{r ECDF plot per confounder}
+#| label: fig-ECDF-ADJ
+#| fig-cap: "Empirical cumulative distribution functions of risk ratios (RR) across inclusion/exclusion of different adjustment variables."
+#| echo: false
+#| out-width: "100%"
+#| fig-align: "left"
+#| fig-pos: "H"
+
+knitr::include_graphics("ECDF_per_confounder.png")
+```
+
+```{r full RR table}
+#| label: tbl-RRfulltable
+#| tbl-cap: "Number of universes including specific decision options, non-convergence, RRs, their range and percentage of significant RRs across decisions and their options."
+#| warning: false
+#| include: true
+#| echo: false
+full_table %>%
+  kbl(
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+    align = c("l", "l", "r", "r", "r", "c", "r"),
+    col.names = c("Decision", "Option", "Succesful Universes", "Non-convergence", "Mean RR", "RR Range", "% Sig")
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header", "hold_position"),
+    full_width = FALSE,
+    font_size = 6.5  
+  ) %>%
+  column_spec(1, width = "2.5cm") %>%
+  column_spec(2, width = "5cm") %>%
+  column_spec(3, width = "1.2cm") %>%
+  column_spec(4, width = "1.2cm") %>%
+  column_spec(5, width = "1.5cm") %>%
+  column_spec(6, width = "2cm") %>%
+  column_spec(7, width = "1.2cm")
+```

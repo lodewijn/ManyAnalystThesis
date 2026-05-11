@@ -1,0 +1,222 @@
+---
+title: "Methods Draft 1"
+author: Loesje Ubbink
+date: today
+date-format: "D/M/YYYY"
+format:
+  pdf:
+    keep-tex: false
+    header-includes:
+      - \usepackage{float}
+      - \floatplacement{figure}{H}
+    include-in-header:
+      - text: |
+          \usepackage{tabularx}
+          \usepackage{threeparttable}
+          \usepackage{ragged2e}
+          \usepackage{booktabs}
+number-sections: true
+csl: apa.csl
+bibliography: ref_28-04-26.bib
+---
+
+```{r setup, echo = F, include = F, warning = F, message = F}
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(kSamples)
+library(tibble)
+library(kableExtra)
+library(stats)
+
+decision_space_raw <- read_csv(here("data/decision_space/decision_space_raw.csv"))
+decision_space <- read_csv(here("data/decision_space/decision_space.csv"))
+sampled_universes <- readRDS(here("data/sampled_universes/sampled_universes_100.RDS"))
+results <- readRDS(here("data/results/all_models_final_results_Univ100_6400_2026-04-20.RDS"))
+
+# Make sure all NAs are seen as NAs
+results <- results %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+
+# How are NAs distributed per statistical model?
+NAperModel <- results %>%
+  group_by(model_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+descRR <- results |>
+  filter(!is.na(RR)) |>
+  summarise(min = round(min(RR), 2),
+    max = round(max(RR), 2),
+    percSig = sum(p.value < 0.05)/nrow(results) * 100,
+    median = round(median(RR), 2),
+    mean = round(mean(RR), 2),
+    sd = round(sd(RR), 2))
+
+converged_results <- nrow(sampled_universes) - sum(is.na(results$RR))
+```
+
+# Methods
+## Ethics
+Ethical approval was granted by the Ethics Review Board of the Faculty of Social and Behavioural Sciences of Utrecht University. 
+
+## Data 
+```{r dfs from all 4 DT sample size and number of part, echo=F, include=F, message=F, warning=F}
+df_CA <- readRDS(here("data/DataTypeDfs/df_CA.RDS"))
+df_CW1 <- readRDS(here("data/DataTypeDfs/df_CW1.RDS"))
+df_LNS <- readRDS(here("data/DataTypeDfs/df_LNS.RDS"))
+df_LW1 <- readRDS(here("data/DataTypeDfs/df_LW1.RDS"))
+```
+
+Consistent with @kowall_marital_2025, data from waves 1-7 (excluding wave 3) of the Survey of Health, Ageing and Retirement in Europe (SHARE) were used. SHARE is a longitudinal panel study conducted across 28 European countries, collecting data on health, social, economic and environmental policies, since 2004.
+
+All variables needed for the construction of the decision space (outcome, exposure, adjustment, exclusion) were selected from different datasets that were available per wave. Then, one cleaned data set was created per wave, where the selected variables were linked through an ID variable. Lastly, all wave data sets were combined based on the selected Data Type option in the multiverse analysis. After data cleaning, but before applying the exclusion criteria and missing data handling, the samples consisted of:
+
+- cross-secional all waves: `r format(length(unique(df_CA$mergeid)), big.mark = ",")` participants across `r format(nrow(df_CA), big.mark = ",")` observations.
+- cross-sectional wave 1: `r format(length(unique(df_CW1$mergeid)), big.mark = ",")` participants across `r format(nrow(df_CW1), big.mark = ",")` observations.
+- longitudinal no strict baseline: `r format(length(unique(df_LNS$mergeid)), big.mark = ",")` participants across `r format(nrow(df_LNS), big.mark = ",")` observations.
+- longitudinal wave 1: `r format(length(unique(df_LW1$mergeid)), big.mark = ",")` participants across `r format(nrow(df_LW1), big.mark = ",")` observations.
+
+## Definition of decision space 
+To define the decision space, all options of six different decisions made by the teams in @kowall_marital_2025 were identified based on information provided in the original publication (see Table \ref{tab:decision_space}). When systematically combining all options across decisions, the decision space consisted of `r format(nrow(decision_space_raw), big.mark = ",")` universes. After removing invalid research paths, `r format(nrow(decision_space), big.mark = ",")` valid universes remained. Invalid paths included combinations of cross-sectional data with models requiring longitudinal data structure (Cox proportional hazards (Cox PH), discrete-time mixed-effects), cross-sectional wave 1 data with models requiring repeated measures (mixed-effects logistic regression, generalised estimating equations (GEE)), wave 1 data with outcomes that were not available at baseline (since last interview, cause of death), and Cox models with outcomes lacking time-to-event variables.
+
+## Classifying sources of variation using the AB-framework
+The selected decisions were classified using the AB-framework. Missing data and statistical model choice were classified as harmful sources of variation. Operationalisation of the outcome variable, selection of confounders, and exclusion criteria were classified as helpful. Data structure was also classified as helpful, as the framework treats variations over time as representing different target populations (see Table \ref{tab:decision_space}).
+
+```{=latex}
+\begin{table}[htbp]
+\centering
+\caption{Analytical decisions and their options based on the orginal many-analyst study, that were used in the present multiverse analysis.}
+\label{tab:decision_space}
+\begin{threeparttable}
+\scriptsize 
+\setlength{\tabcolsep}{4pt} 
+\renewcommand{\arraystretch}{1.1}  
+\begin{tabularx}{\textwidth}{
+>{\RaggedRight\arraybackslash}p{3.2cm}
+>{\RaggedRight\arraybackslash}p{6.2cm}
+>{\RaggedRight\arraybackslash}X
+}
+\toprule
+\textbf{Decision} & \textbf{Option} & \textbf{Notes / Deviations from original} \\
+\midrule
+\multicolumn{2}{l}{\textbf{Harmful sources of variation}} \\
+\midrule
+Missing Data &
+Complete cases (16) \newline
+``No information'' (1)
+&
+For complete cases, listwise deletion was applied. One team replaced missing values in categorical variables by ``no information'' to prevent listwise deletion. In the original, some analysts used imputed data provided by SHARE, these were not used in the present multiverse analysis.  \\
+\addlinespace
+Statistical Model &
+Cox proportional hazards model (6) \newline
+Logistic regression (5) \newline
+Log-binomial model (2) \newline
+Mixed-effects logistic regression (1) \newline
+Discrete-time mixed-effects model (1) \newline
+Generalised estimating equations (1)
+&
+The original study reported different effect sizes (OR/HR/RR). For comparability across universes, in this study, all effect sizes were converted to risk ratios (RR). \\
+\addlinespace
+\multicolumn{3}{l}{\textbf{Helpful sources of variation}} \\
+\midrule
+Data Type &
+Cross-sectional wave 1 (5) \newline
+Cross-sectional all waves (1) \newline
+Longitudinal, wave 1 as only baseline (3) \newline
+Longitudinal, no strict baseline (10) 
+&
+The cleaned datasets for each wave were combined in different ways, depending on the selected option. \\
+\addlinespace
+Exclusion Criteria &
+Subjects married before 18 \newline
+Subjects from Israel \newline
+Subjects under 55 at recruitment \newline
+Subjects born after 1954 \newline
+Change in exposure (widowed/divorced)
+&
+The analysts in the original study often used idiosyncratic exclusion criteria that were used in the present study. Because the original paper did not specify whether combinations of these exclusion criteria were used, a maximum of one exclusion criterion per universe was applied. *Note: one team removed all participants from Israel, as this is not an European country. \\
+\addlinespace
+Outcome &
+Heart attack / stroke ever (16) \newline
+Age at heart attack / stroke (9) \newline
+Heart attack / stroke since last interview (7) \newline
+Main cause of death: heart attack / stroke (5)
+&
+Seven combinations of the dependent variables were used by the analysts in the original study. Although other combinations are possible, the present study only included the seven operationalisations from the original study. \\
+\addlinespace
+Adjustment Set &
+Age (12) \newline
+Sex (12) \newline
+Country (7) \newline
+Smoking (6) \newline
+Education (4) \newline
+Physical activity (4) \newline
+No confounders (2)
+&
+To ensure feasibility of the present multiverse analysis, only adjustment variables used by at least four analysts, except `no confounders', were included to create the adjustment sets. \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Note}. Numbers in parentheses indicate how many analysts selected each option in the original study.
+\item \textit{Note}. For the exposure variable, all teams but two used ``cohabiting married" (CM). Some analysts also included registered partnership, and ``married living apart". However, since the original research question only focused on CM, this was the only variable used as exposure in the present study.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+```
+
+## Converting OR and HR to RR
+The statistical models yielded different effect size measures. Logistic regression, mixed-effects logistic regression, GEE, and discrete-time mixed-effects models produced odds ratios (OR). Cox PH models produced hazard ratios (HR). Log-binomial models produced risk ratios (RR) directly. To enable comparison across universes, all effect sizes were converted to RRs. Odds ratios and hazard ratios both approximate risk ratios when the outcome is rare, but can diverge substantially when the outcome is common [@vanderweele_optimal_2020]. Given that the overall prevalence in the unexposed group ($p_0$) was around 18% in all subsets of the data, conversions for both OR and HR were necessary.
+
+Conversions to risk ratios often require knowing $p_0$ [@zhang_whats_1998]. However, in a multiverse analysis, $p_0$ may vary across universes, depending on data type and exclusion decisions resulting in different data subsets. This could introduce arbitrary variation in the results, distorting the actual decision sensitivity.
+
+Therefore, conversions proposed by @vanderweele_optimal_2020 were used, designed for scenarios when $p_0$ is unknown but exceeds 10%. For odds ratios [@huang_development_2022]:
+
+\begin{align}
+  RR \approx \sqrt{OR}
+\end{align}
+
+For hazard ratios, where prevalence is estimated between 20% and 80% [@vanderweele_optimal_2020; @huang_development_2022-1]:
+
+\begin{align}
+  RR \approx \frac{1 - 0.5^{\sqrt{HR}}}{1 - 0.5^{\sqrt{1 / HR}}}
+\end{align}
+
+Although the overall prevalence was slightly lower than 20%, a conversion not requiring a specific $p_0$ value was preferred to avoid introducing additional variation.
+
+## Round Robin sampling
+
+
+Because the number of reasonable universes grows exponentially with the number of decisions and their options, the computational cost of multiverse analyses increases rapidly. To address this, @liu_approximation_2023 proposed sampling universes rather than exploring the full decision space. They evaluated various algorithms and found that Round Robin sampling was one of the most effective methods for approximating multiverse results. Therefore, this method was applied in the present study. Round Robin sampling aims to represent each decision option at least once. The algorithm iteratively loops through all decisions and their options, sampling one universe at each stage without replacement, ensuring each sampled universe is included at most once. For a visual example of how the algorithm works, see @fig-roundrobin. 
+
+Although @liu_approximation_2023 proposed sampling universes one by one and immediately processing the multiverse results, in this study universes were selected *a priori* before running the multiverse analysis. The sampler was implemented in two steps. First, decision options were mapped to corresponding row numbers in the full decision space. Then, row numbers were sampled according to the Round Robin algorithm and used to select universes from the original decision space. This approach was more computationally efficient than sampling directly from the decision space. A random seed was set to ensure reproducibility.
+
+To ensure sufficient data were available for each option to quantify decision sensitivity, a minimum of 100 universes per option was sampled. As adjustment set had the most options (64), this resulted in `r format(nrow(sampled_universes), big.mark = ",")` sampled universes in total.
+
+```{r ECDF plot}
+#| label: fig-roundrobin
+#| fig-cap: "Schematic overview of Round Robin sampling algorithm. U: universe; T: the set of sampled universes. Figure was created by L. Ubbink."
+#| echo: false
+#| out-width: "100%"
+#| fig-align: "left"
+#| fig-pos: "H"
+
+knitr::include_graphics("RoundRobinkleur.png")
+```
+
+## Decision sensitivity
+After converting all effect size estimates to risk ratios, density plots were used to visualise RR distributions across decision options. In addition, to visually assess the robustness of multiverse outcomes, each universe was plotted against its estimated effect size in a specification curve [@simonsohn_specification_2015]. However, as both methods only provide descriptive information about the distribution of results rather than quantifying decision sensitivity, they were used as visual aids to inspect whether the outcome distribution was robust to different analytical specifications.
+
+To quantify the decision sensitivity - the extent to which different options within each analytical decision lead to different outcomes - k-sample Anderson-Darling tests (AD tests) were used, as proposed by @liu_approximation_2023. This test evaluates whether the RRs resulting from *k* options within a decision stem from the same empirical cumulative distribution function (ECDF). If this null hypothesis was rejected, the decision was classified as sensitive. The AD statistic measures the weighted difference between the ECDFs of *k* samples. The standardised AD statistic (T.AD), which adjusts for number of groups and sample size, was used for between-decision comparisons. Higher T.AD values indicate more sensitive decisions.
+
+Because there were 64 different adjustment sets, Kolmogorov-Smirnov tests (KS tests) were used for a more detailed evaluation of its decision sensitivity, comparing RR distributions for specifications including versus excluding each adjustment variable. The KS test statistic (D) represents the maximum absolute difference between the empirical cumulative distribution functions of the two samples, ranging from 0 (identical) to 1 (no overlap). Values closer to 0 indicate a higher likelihood that the two samples were drawn from the same distribution.
+
+## Supplementary Materials
+All analyses were conducted in R [version 4.4.2, @r_core_team_r_2024]. All code scripts containing sampler and multiverse functions, and package versions documented in the lock file, can be found [here](https://github.com/lodewijn/ManyAnalystThesisCompendium).
+
+
+# References
