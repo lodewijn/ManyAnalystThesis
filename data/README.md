@@ -17,22 +17,25 @@ not able to share them on github.
 An example of which data files are relevant and how they should be placed in the folder structure can be found below:
 
 ### For wave 1
-01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_br.sav
-01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_dn.sav
-01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_gv_health.sav
-01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_ph.sav
-01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_cv_r.sav
+
+- 01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_br.sav
+- 01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_dn.sav
+- 01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_gv_health.sav
+- 01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_ph.sav
+- 01_research_compendium/data/rawdata/wave1/sharew1_rel9-0-0_cv_r.sav
 
 ### For wave 2 (repeat for 4, 5, 6 and 7)
-01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_br.sav
-01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_dn.sav
-01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_gv_health.sav
-01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_ph.sav
-01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_xt.sav
-01_research_compendium/data/rawdata/wave1/sharew2_rel9-0-0_cv_r.sav
+
+- 01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_br.sav
+- 01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_dn.sav
+- 01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_gv_health.sav
+- 01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_ph.sav
+- 01_research_compendium/data/rawdata/wave2/sharew2_rel9-0-0_xt.sav
+- 01_research_compendium/data/rawdata/wave1/sharew2_rel9-0-0_cv_r.sav
+
 *Note: waves 2 - 7 contain one dataset more than wave 1, as these contain information about death since last interview*
 
-# Data Structure and Variables
+# Variables
 
 In this study, waves 1-7 of the SHARE are used.
 
