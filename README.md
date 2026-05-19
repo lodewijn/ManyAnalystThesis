@@ -22,6 +22,10 @@ This project aims to answer the research question: To what extent do different t
 missing data, choice of statistical model and definitions of outcome variables, covariates and target
 population, contribute to variation in the outcomes of many-analyst projects?
 
+Folders `data`, `scripts` and `docs` are relevant. More information about those folders and their content can be found below.
+
+*Note: the `results` folder can be found inside the [data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/results).*
+
 # Data
 ## Raw and Clean Data
 Consistent with Kowall et al. (2025), data from waves 1-7 (excluding wave 3) of the
@@ -89,7 +93,7 @@ different data frames were combined into one large data set with all relevant va
 - `03_run_all_scripts`: When reproducing these results, it is not necessary to run all wave-specific files individually. Using this R file, all files in `01_` and `02_` are sourced.
 - `04_add_end_of_life_data`: Since the end-of-life data contains the cause of death of people in earlier waves, this dataset could only be merged with the other data after all waves were combined (the merge-IDs of people who died before a wave are not in that same wave). Therefore, in the 04_ file the data from all waves were first merged, and then joined with the end-of-life datasets from SHARE.
 
-*Note: it is sufficient to only run scripts `03_run_all_scripts` and `04_add_end_of_life_data` when reproducing these results.*
+*Note: it is sufficient to only run `03_run_all_scripts` and `04_add_end_of_life_data` when reproducing these results.*
 
 
 ## 02 Decision Space
