@@ -66,7 +66,10 @@ This is the R project file for the repository. It contains the project settings 
 ### Reproduce the Environment
 The `renv` folder and the `renv.lock` file contain information about the R environment used in the analyses. Using the `renv` package, 
 the R environment can be restored, by running `renv::restore()` in R before running any of 
-the analysis files to make sure correct package versions are installed.
+the analysis files to make sure correct package versions are installed. 
+
+The `seed` that was used is always 260722, which is the birthday (26-07-2022) of my dog Kobus. By always
+using the same seed, I ensured no seedhacking would take place.
 
 ## Decision Space
 To define the decision space, all options of six different decisions made by the teams in
