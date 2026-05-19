@@ -105,7 +105,7 @@ different data frames were combined into one large data set with all relevant va
 This code systematically combines all decision options and stores the valid decision space in a .csv file.
 
 ## 03 Round Robin Sampler
-The Round Robin sampling was implemented in two steps. First, decision
+The Round Robin sampler was implemented in two steps. First, decision
 options were mapped to corresponding row numbers in the full decision space (`01_universe_rownr_function`). Then, row
 numbers were sampled according to the Round Robin algorithm and used to select universes from
 the original decision space (`02_round_robin_sampler_function`). 
@@ -113,7 +113,7 @@ the original decision space (`02_round_robin_sampler_function`).
 *Note: it is sufficient to only run `03_run_all_round_robin_scripts` when reproducing these results.*
 
 ## 04 Multiverse Analysis
-The functions for all analysis steps were implemented in separate R files (`01_`--`08_`) and then looped over the decision space (use only `09e_multiverse_function_final_corrected`).
+The functions for all analysis steps were implemented in separate R files (`01_`-`08_`) and then looped over the decision space (use only `09e_multiverse_function_final_corrected`).
 
 *Note: it is sufficient to only run `10_run_multiverse_results` when reproducing these results, as this sources all multiverse functions.*
 
@@ -121,7 +121,7 @@ The functions for all analysis steps were implemented in separate R files (`01_`
 Density plots and a specification curve were used to describe the robustness of the results. Images (png) of these plots were stored in the `docs/Thesis_Draft` file, under `figures`.
 
 # Docs
-Under `Thesis_Draft`, the manuscripts of the final thesis can be found.
+Under `Thesis_Draft/Thesis_Draft_FINAL`, the manuscript of the final thesis can be found.
 
 # Ethics
 Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
@@ -164,3 +164,7 @@ SHARE-ERIC. https://doi.org/10.6103/SHARE.W6.900
 
 SHARE-ERIC. (2024f). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 7.
 SHARE-ERIC. https://doi.org/10.6103/SHARE.W7.900
+
+# AI Statement
+During this thesis, generative AI (Claude Sonnet 4.6, Claude Opus 4.6, Claude Opus 4.7)
+was used for text editing/improving grammar and assistance/debugging during coding.
