@@ -40,8 +40,10 @@ An example of which data files are relevant and how they should be placed in the
 *Note: waves 2 - 7 contain one dataset more than wave 1, as these contain information about death since last interview*
 
 # Variables
-
 The following variables were used in this multiverse analysis.
+
+# Participant ID
+- `mergeid`: Participant ID, used to merge data sets of different waves.
 
 # Outcomes
 -   `ph006d1`: Heart attack: ever diagnosed
@@ -57,46 +59,20 @@ The following variables were used in this multiverse analysis.
 
 -   `dn014_`: Marital status (exposed group is 'married & living together')
 
-# Adjustment Sets\
-
-*Age* 
+# Adjustment Sets
 
 - `age_int`: Age at interview
-
-*Sex* 
-
-- dn042\_: Male or female
-
-*Country* 
-
-- country: country identifier
-
-*Education* 
-
-- dn010\_: highest degree obtained (education)
-
-*For smoking it's a bit unclear:* 
-
-- br001\_: Ever smoked daily 
-- br002\_: Smoke at present time 
-- br003\_: How many years smoked 
-- br004\_: Age stopped smoking 
-- br005\_: Type of smoke (cigarettes/pipes etc) 
-- br006\_ - br008\_: Average amount of cigs / day
-
-*Note: given that not all variables were present in all waves, I decided to*
-*include only br002\_ (smoke at present time).*
-
-*Physical Activity (from health dataset)* 
-- phactiv: physical inactivity
+- `dn042_`: Sex
+- `country`: Country identifier
+- `dn010_`: Highest country-specific degree obtained (education)
+- `br001_`: Ever smoked daily 
+- `phactiv`: Physical inactivity
 
 ## Extra Variables Needed for Exclusion Criteria
-*Subjects married before 18*
-- dn015\_: Year of marriage (when living together)
+- `dn015_`: Year of marriage (when living together)
+- `dn018_`: Since when divorced
+- `dn019_`: Since when widowed 
+- `dn003_`: Year of birth
+- `country`: In some analyses, people from Israel were excluded.
 
-*Change in exposure*
-- dn018\_: Since when divorced
-- dn019\_: Since when widowed 
-- dn003\_: year of birth
-
-<https://www.share-datadocutool.org/study-units/view/1>
+For more information about the variables, see [SHARE](https://www.share-datadocutool.org/study-units/view/1).

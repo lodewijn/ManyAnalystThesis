@@ -25,7 +25,7 @@ missingness_function <- function(df, missing_data) {
              br001_    = fct_na_value_to_level(br001_, level = "NoInfo"),  # ever smoked daily
              phactiv   = fct_na_value_to_level(phactiv, level = "NoInfo")) |>  # physical activity
     
-      drop_na(age_int) # becasue some models cannot handle NAs 
+      drop_na(age_int) # because some models cannot handle NAs 
       # and there were only 20 NAs in age_int, it was decided to drop these rows
   
       }
