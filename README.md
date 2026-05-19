@@ -64,7 +64,9 @@ the number of participants and observations across Data Type options, which was 
 This is the R project file for the repository. It contains the project settings and configuration. Open this project in RStudio before running any of the analysis files.
 
 ### Reproduce the Environment
-Run `renv::restore()` in RStudio before running any of the analysis files to make sure correct package versions are installed.
+The `renv` folder and the `renv.lock` file contain information about the R environment used in the analyses. Using the `renv` package, 
+the R environment can be restored, by running `renv::restore()` in R before running any of 
+the analysis files to make sure correct package versions are installed.
 
 ## Decision Space
 To define the decision space, all options of six different decisions made by the teams in
