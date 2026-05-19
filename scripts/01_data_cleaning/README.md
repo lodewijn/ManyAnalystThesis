@@ -30,4 +30,4 @@ Since the end-of-life data contains the cause of death of people in earlier wave
 this dataset could only be merged with the other data after all waves were combined 
 (the merge-IDs of people who died before a wave are not in that same wave). Therefore, 
 in the `04_ file` the data from all waves were first merged, and then joined with the 
-end-of-life datasets from SHARE.
+end-of-life data sets from SHARE.
