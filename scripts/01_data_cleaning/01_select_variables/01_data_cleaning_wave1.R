@@ -71,7 +71,7 @@ w1_age <- w1_age |>
                
 
 # Merge all datasets of Wave 1 together using mergeid
-w1 <- w1_ph %>%
+w1 <- w1_ph |>
   left_join(w1_dn, by = "mergeid") |>
   left_join(w1_br, by = "mergeid") |> 
   left_join(w1_health, by = "mergeid") |>

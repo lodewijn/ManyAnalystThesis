@@ -14,7 +14,7 @@ w6 <- readRDS(here("data/cleandata/w6_clean.RDS"))
 w7 <- readRDS(here("data/cleandata/w7_clean.RDS"))
 
 # Covert age variables to numeric per wave
-# And change so all waves can be merged at a later stage
+# And make sure all waves can be merged at a later stage
 
 w1 <- w1 |>
   mutate(age_wave = as.numeric(as.character(age2004))) |>

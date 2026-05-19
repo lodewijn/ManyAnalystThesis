@@ -68,7 +68,7 @@ w5_age <- w5_age |>
          age2013)          # age in 2013
 
 # Merge all datasets of Wave 5 together using mergeid
-w5 <- w5_ph %>%
+w5 <- w5_ph |>
   left_join(w5_dn, by = "mergeid") |>
   left_join(w5_br, by = "mergeid") |>
   left_join(w5_health, by = "mergeid") |>
