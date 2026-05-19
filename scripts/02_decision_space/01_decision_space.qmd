@@ -50,7 +50,7 @@ outcome_options <- list(
   recursive = FALSE
 )
   
-## SELECT ONLY THE 7 THAT WERE ACTUALLY USED IN ORIGINAL MANY-ANALYST!
+## SELECT ONLY THE 7 THAT WERE ACTUALLY USED IN ORIGINAL MANY-ANALYST STUDY!
 
 outcome_combinations <- c(outcome_combinations[15],
                           outcome_combinations[1],

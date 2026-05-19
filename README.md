@@ -44,7 +44,7 @@ in Europe (SHARE) are only available after registration, they cannot be publicly
 
 **If you are already registered**, to access the data, please follow these steps:
 - visit: [https://releases.sharedataportal.eu/users/login](https://releases.sharedataportal.eu/users/login)
-- here you see the data files for all waves, in this study only waves 2, 4, 5, 6 and 7 are used, so these are the only ones that need to be downloaded
+- here you see the data files for all waves, in this study only waves 1, 2, 4, 5, 6 and 7 are used, so these are the only ones that need to be downloaded
 - note: the SPSS data are used, such as: sharew1_rel9-0-0_ALL_datasets_spss.zip
 
 **After getting access to the full data**, select only those files that are needed in this study.
@@ -59,6 +59,12 @@ the number of participants and observations across Data Type options, which was 
 - Cross-sectional Wave 1: 30,416 participants across 30,416 observations.
 - Longitudinal no strict baseline: 87,029 participants across 285,026 observations.
 - Longitudinal Wave 1: 23,301 participants across 91,935 observations.
+
+### `ManyAnalystThesisCompendium.Rproj`
+This is the R project file for the repository. It contains the project settings and configuration. Open this project in RStudio before running any of the analysis files.
+
+### Reproduce the Environment
+Run `renv::restore()` in RStudio before running any of the analysis files to make sure correct package versions are installed.
 
 ## Decision Space
 To define the decision space, all options of six different decisions made by the teams in
@@ -95,22 +101,27 @@ different data frames were combined into one large data set with all relevant va
 
 *Note: it is sufficient to only run `03_run_all_scripts` and `04_add_end_of_life_data` when reproducing these results.*
 
-
 ## 02 Decision Space
-## 03 Round Robin Sampler
-## 04 Multiverse Analysis
-## 05 Results Plots
+This code systematically combines all decision options and stores the valid decision space in a .csv file.
 
+## 03 Round Robin Sampler
+The Round Robin sampling was implemented in two steps. First, decision
+options were mapped to corresponding row numbers in the full decision space (`01_universe_rownr_function`). Then, row
+numbers were sampled according to the Round Robin algorithm and used to select universes from
+the original decision space (`02_round_robin_sampler_function`). 
+
+*Note: it is sufficient to only run `03_run_all_round_robin_scripts` when reproducing these results.*
+
+## 04 Multiverse Analysis
+The functions for all analysis steps were implemented in separate R files (`01_`--`08_`) and then looped over the decision space (use only `09e_multiverse_function_final_corrected`).
+
+*Note: it is sufficient to only run `10_run_multiverse_results` when reproducing these results, as this sources all multiverse functions.*
+
+## 05 Results Plots
+Density plots and a specification curve were used to describe the robustness of the results. Images (png) of these plots were stored in the `docs/Thesis_Draft` file, under `figures`.
 
 # Docs
-In this file, the manusctipts of the final thesis, as well as the intermediate research report can be found.
-
-
-### `ManyAnalystThesisCompendium.Rproj`
-This is the R project file for the repository. It contains the project settings and configuration. Open this project in RStudio before running any of the analysis files.
-
-### `activate.R in renv file`
-Run this file in RStudio before running any of the analysis files to make sure correct package versions are installed.
+Under `Thesis_Draft`, the manuscripts of the final thesis can be found.
 
 # Ethics
 Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
@@ -123,3 +134,33 @@ This archive will indefinitely be publicly available on GitHub.
 Full responsibility for the content of this archive lies with Loesje Ubbink. 
 In the case of questions, do not hesitate to contact me by emailing l.ubbink@students.uu.nl or loes.ubbink@gmail.com.
 
+# References
+Börsch-Supan, A., Brandt, M., Hunkler, C., Kneip, T., Korbmacher, J., Malter, F., Schaan, B.,
+Stuck, S., & Zuber, S. (2013). Data Resource Profile: The Survey of Health, Ageing and
+Retirement in Europe (SHARE). International Journal of Epidemiology, 42(4), 992–1001.
+https://doi.org/10.1093/ije/dyt088
+
+Kowall, B., Ahrenfeldt, L. J., Basten, J., Becher, H., Brand, T., Braun, J., Casjens, S., Claessen, H.,
+Denz, R., Diebner, H. H., Diexer, S., Eisemann, N., Furrer, E., Galetzka, W., Girschik, C.,
+Karch, A., Mikolajczyk, R., Peters, M., Rospleszcz, S., … Rübsamen, N. (2025). Marital
+status and risk of cardiovascular disease – a multi-analyst study in epidemiology.
+European Journal of Epidemiology, 40(5), 497–509.
+https://doi.org/10.1007/s10654-025-01235-8
+
+SHARE-ERIC. (2024a). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 1.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W1.900
+
+SHARE-ERIC. (2024b). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 2.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W2.900
+
+SHARE-ERIC. (2024c). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 4.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W4.900
+
+SHARE-ERIC. (2024d). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 5.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W5.900
+
+SHARE-ERIC. (2024e). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 6.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W6.900
+
+SHARE-ERIC. (2024f). Survey of Health, Ageing and Retirement in Europe (SHARE) Wave 7.
+SHARE-ERIC. https://doi.org/10.6103/SHARE.W7.900
