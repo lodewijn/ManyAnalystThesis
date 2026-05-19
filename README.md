@@ -126,15 +126,16 @@ Under `Thesis_Draft/Thesis_Draft_FINAL`, the manuscript of the final thesis can 
 # Reproduction Recipe
 These results can be reproduced by running the scripts in the following order:
 
-- Open the project `ManyAnalystThesisCompendium.Rproj`.
-- Run `renv::restore()`.
-- Make sure all data sets from the correct waves are stored in the correct folder by following the folder structure that can be found in the [raw data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/rawdata).
-- Run `03_run_all_scripts` and `04_add_end_of_life_data` from [01_data_cleaning](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/01_data_cleaning).
-- Run `01_decision_space` from the [02_decision_space](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/02_decision_space).
-- Run `03_run_all_round_robin_scripts` from [03_round_robin_sampler](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/03_round_robin_sampler).
-- Run `10_run_multiverse_results` from [04_set_up_multiverse](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/04_set_up_multiverse).
-- Run `01_density_plots_results_multiverse` and `02_specification_curve` from [05_results_plots](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/05_results_plots).
-- To get the full manuscript, run `Thesis_Draft_FINAL.qmd` from [this folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/docs/Thesis_Draft/Thesis_Draft_FINAL).
+1. Make sure you have at least R version 4.4.2, with the `renv` package installed.
+2. Open the project `ManyAnalystThesisCompendium.Rproj`.
+3. Run `renv::restore()`.
+4. Make sure all data sets from the correct waves are stored in the correct folder by following the folder structure that can be found in the [raw data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/rawdata).
+5. Run `03_run_all_scripts` and `04_add_end_of_life_data` from [01_data_cleaning](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/01_data_cleaning).
+6. Run `01_decision_space` from the [02_decision_space](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/02_decision_space).
+7. Run `03_run_all_round_robin_scripts` from [03_round_robin_sampler](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/03_round_robin_sampler).
+8. Run `10_run_multiverse_results` from [04_set_up_multiverse](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/04_set_up_multiverse).
+9. Run `01_density_plots_results_multiverse` and `02_specification_curve` from [05_results_plots](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/05_results_plots).
+10. To get the full manuscript, run `Thesis_Draft_FINAL.qmd` from [this folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/docs/Thesis_Draft/Thesis_Draft_FINAL).
 
 # Ethics
 Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
