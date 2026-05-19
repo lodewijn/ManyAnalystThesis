@@ -11,15 +11,15 @@ Create a list that contains rownumbers of all universes per decision option.
 This makes sampling universes per specific decision/option easier with larger decision spaces
 
 This will create option-lists, within decision-lists, within a general list, with the following structure:
-    ### universe_rownumbers
-          ### data_type
-              ### long_w1
-                  ### 1, 2, 3, rownumbers...
-              ### long_nostrict
-                  ### 4, 5, 6, rownumbers...
-          ### outcome
-              ### event_ever
-                  ### 1, 3, 5, rownumbers...
-              ### event_ever + age_at_event
-                  ### 2, 4, 6, rownumbers...
+ ### universe_rownumbers
+ 
+ ######### data_type
+ 
+  ############### long_w1: 1, 2, 3,...
+  ############### long_nostrict: 4, 5, 6,...
+  
+ ######### outcome
+ 
+  ############### event_ever: 1, 3, 5,...
+  ############### event_ever + age_at_event: 2, 4, 6,...
 
