@@ -24,7 +24,7 @@ population, contribute to variation in the outcomes of many-analyst projects?
 
 Folders `data`, `scripts` and `docs` are relevant. More information about those folders and their content can be found below.
 
-*Note: the `results` folder can be found inside the [data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/results).*
+*Note: the `results` folder can be found inside the [data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/results) and code for plotting the results can be found in the [05_results_plots folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/05_results_plots).*
 
 # Data
 ## Raw and Clean Data
