@@ -1,7 +1,11 @@
 # Access Data
+Consistent with Kowall et al. (2025), data from waves 1-7 (excluding wave 3) of the
+Survey of Health, Ageing and Retirement in Europe (SHARE) were used. SHARE is a
+longitudinal panel study conducted across 28 European countries, collecting data on health, social,
+economic and environmental policies, since 2004 (Börsch-Supan et al., 2013; SHARE-ERIC, 2024a, 2024b, 2024c, 2024d, 2024e, 2024f) .
+
 Because the data from the Survey of Health, Ageing, and Retirement
-in Europe (SHARE) are only available after registration, unfortunatley, I am
-not able to share them on github. 
+in Europe (SHARE) are only available after registration, they cannot be publicly shared on github. 
 
 **If you are not registered yet**, to access the data, please follow these steps:
 - visit: [https://share-eric.eu/data/](https://share-eric.eu/data/)
@@ -37,29 +41,27 @@ An example of which data files are relevant and how they should be placed in the
 
 # Variables
 
-In this study, waves 1-7 of the SHARE are used.
-
-The focus is on the following variables:
+The following variables were used in this multiverse analysis.
 
 # Outcomes
-
--   ph006d1: Heart attack: ever diagnosed
--   ph006d4: Stroke: ever diagnosed
--   ph009_1: Age heart attack or other heart problems
--   ph009_4: Age stroke or cerebral vascular disease
--   ph067_1, ph067_2, ph072_1, ph072_2: Heart attack / stroke since
+-   `ph006d1`: Heart attack: ever diagnosed
+-   `ph006d4`: Stroke: ever diagnosed
+-   `ph009_1`: Age heart attack or other heart problems
+-   `ph009_4`: Age stroke or cerebral vascular disease
+-   `ph067_1`, `ph067_2`, `ph072_1`, `ph072_2`: Heart attack / stroke since
     last interview
--   xt011\_: Main cause of death heart attack / stroke
+-   `xt011_`: Main cause of death
+-   `xt010_`: Age at death
 
 # Exposure
 
--   dn014\_ Marital status (married & living together)
+-   `dn014_`: Marital status (exposed group is 'married & living together')
 
 # Adjustment Sets\
 
 *Age* 
 
-- dn002\_: month of birth - dn003\_: year of birth
+- `age_int`: Age at interview
 
 *Sex* 
 
@@ -95,5 +97,6 @@ The focus is on the following variables:
 *Change in exposure*
 - dn018\_: Since when divorced
 - dn019\_: Since when widowed 
+- dn003\_: year of birth
 
 <https://www.share-datadocutool.org/study-units/view/1>
