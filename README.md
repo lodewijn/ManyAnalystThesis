@@ -141,7 +141,7 @@ These results can be reproduced by running the scripts in the following order:
 Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
 
 # License
-This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](https://github.com/lodewijn/ManyAnalystThesis/blob/main/LICENSE) file for details.
 
 # Permissions and Access
 This archive will indefinitely be publicly available on GitHub. 
