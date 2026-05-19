@@ -69,7 +69,7 @@ the R environment can be restored, by running `renv::restore()` in R before runn
 the analysis files to make sure correct package versions are installed. 
 
 The `seed` that was used is always 260722, which is the birthday (26-07-2022) of my dog Kobus. By always
-using the same seed, I ensured no seedhacking would take place.
+using this same seed, I ensured no seedhacking would take place.
 
 ## Decision Space
 To define the decision space, all options of six different decisions made by the teams in
