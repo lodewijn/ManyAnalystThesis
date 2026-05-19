@@ -1,33 +1,25 @@
-# Data Cleaning
+# Round Robin Sampler
+The Round Robin sampler was implemented in two steps. First, decision
+options were mapped to corresponding row numbers in the full decision space (`01_universe_rownr_function`). Then, row
+numbers were sampled according to the Round Robin algorithm and used to select universes from
+the original decision space (`02_round_robin_sampler_function`). 
 
-First, the `01_ files` contain data cleaning in all waves separately. 
+*Note: it is sufficient to only run `03_run_all_round_robin_scripts` when reproducing these results.*
 
-- In these files, all relevant variables needed for the multiverse are selected 
-from the separate raw data files.
-- Then, the smaller data sets containing the relevant variables are merged 
-into one large data set per wave (called `w1` - `w7`) based on the matching ID variables. 
-- Lastly, new csv files are written containing the clean data of all waves.
+## Row Numbers
+Create a list that contains rownumbers of all universes per decision option.
+This makes sampling universes per specific decision/option easier with larger decision spaces
 
-*Note: not all variables were available in all waves, so for some waves*
-*different variables are included in the clean data set.* 
+This will create option-lists, within decision-lists, within a general list, with the following structure:
+    ### universe_rownumbers
+          ### data_type
+              ### long_w1
+                  ### 1, 2, 3, rownumbers...
+              ### long_nostrict
+                  ### 4, 5, 6, rownumbers...
+          ### outcome
+              ### event_ever
+                  ### 1, 3, 5, rownumbers...
+              ### event_ever + age_at_event
+                  ### 2, 4, 6, rownumbers...
 
---- 
-Secondly, the `02_ file` contains functions to convert all time-related 
-variables to numeric variables.
-
-- In different waves, these variables had different data classes, which becomes 
-problematic when trying to merge all waves into one large data set. Therefore, 
-in this file, all age and year variables are converted to numeric values. 
-- Then, the csv files with the clean data are updated with the new numerical 
-time-variables.
-
----
-Then, the `03_ file` can be used to run the cleaning scripts all at once, 
-without having to open and run them all separately.
-
----
-Since the end-of-life data contains the cause of death of people in earlier waves, 
-this dataset could only be merged with the other data after all waves were combined 
-(the merge-IDs of people who died before a wave are not in that same wave). Therefore, 
-in the `04_ file` the data from all waves were first merged, and then joined with the 
-end-of-life datasets from SHARE.

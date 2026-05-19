@@ -1,0 +1,1 @@
+Density plots (`01_density_plots_results_multiverse`) and a specification curve (`02_specification_curve`) were used to describe the robustness of the results. Images (png) of these plots were stored in the `docs/Thesis_Draft` file, under `figures`.
