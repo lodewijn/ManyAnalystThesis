@@ -45,7 +45,16 @@ in Europe (SHARE) are only available after registration, they cannot be publicly
 
 **After getting access to the full data**, select only those files that are needed in this study.
 An example of which data files are relevant and how they should be placed in the 
-folder structure can be found in the [data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data).
+folder structure can be found in the [raw data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/rawdata).
+
+### DataTypeDFs 
+These are the data sets containing data of the four Data Types to see if there were differences in
+the number of participants and observations across Data Type options, which was the case: 
+
+- Cross-sectional all waves: 138,807 participants across 336,804 observations.
+- Cross-sectional Wave 1: 30,416 participants across 30,416 observations.
+- Longitudinal no strict baseline: 87,029 participants across 285,026 observations.
+- Longitudinal Wave 1: 23,301 participants across 91,935 observations.
 
 ## Decision Space
 To define the decision space, all options of six different decisions made by the teams in
@@ -65,6 +74,7 @@ The sampled universes can be found [here](https://github.com/lodewijn/ManyAnalys
 ## Results
 In this folder, all multiverse results (including test results that can be ignored) are stored. 
 Because the files contain the date on which the multiverse results were obtained, the results files are not overwritten. 
+The results that were used for the final thesis are `corrected_results_final_2026-04-28.RDS`.
 
 # Scripts
 
