@@ -118,10 +118,23 @@ The functions for all analysis steps were implemented in separate R files (`01_`
 *Note: it is sufficient to only run `10_run_multiverse_results` when reproducing these results, as this sources all multiverse functions.*
 
 ## 05 Results Plots
-Density plots and a specification curve were used to describe the robustness of the results. Images (png) of these plots were stored in the `docs/Thesis_Draft` file, under `figures`.
+Density plots (`01_density_plots_results_multiverse`) and a specification curve (`02_specification_curve`) were used to describe the robustness of the results. Images (png) of these plots were stored in the `docs/Thesis_Draft` file, under `figures`.
 
 # Docs
 Under `Thesis_Draft/Thesis_Draft_FINAL`, the manuscript of the final thesis can be found.
+
+# Reproduction Recipe
+These results can be reproduced by running the scripts in the following order:
+
+- Open the project `ManyAnalystThesisCompendium.Rproj`.
+- Run `renv::restore()`.
+- Make sure all data sets from the correct waves are stored in the correct folder by following the folder structure that can be found in the [raw data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/rawdata).
+- Run `03_run_all_scripts` and `04_add_end_of_life_data` from [01_data_cleaning](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/01_data_cleaning).
+- Run `01_decision_space` from the [02_decision_space](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/02_decision_space).
+- Run `03_run_all_round_robin_scripts` from [03_round_robin_sampler](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/03_round_robin_sampler).
+- Run `10_run_multiverse_results` from [04_set_up_multiverse](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/04_set_up_multiverse).
+- Run `01_density_plots_results_multiverse` and `02_specification_curve` from [05_results_plots](https://github.com/lodewijn/ManyAnalystThesis/tree/main/scripts/05_results_plots).
+- To get the full manuscript, run `Thesis_Draft_FINAL.qmd` from [this folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/docs/Thesis_Draft/Thesis_Draft_FINAL).
 
 # Ethics
 Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
