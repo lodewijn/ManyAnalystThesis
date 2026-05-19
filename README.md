@@ -1,6 +1,4 @@
 # Variation in Many-Analyst Projects: Harmful or Helpful?
-
-## Introduction
 This repository contains the data and R scripts to reproduce the findings for the Master's thesis *Variation in Many-Analyst Projects: Harmful or Helpful? A Multiverse Approach to Address Different Sources of Variation*, 
 conducting multiverse analysis based on an existing many-analyst project by Kowall et al. (2025). 
 
@@ -24,14 +22,14 @@ This project aims to answer the research question: To what extent do different t
 missing data, choice of statistical model and definitions of outcome variables, covariates and target
 population, contribute to variation in the outcomes of many-analyst projects?
 
-## Data
-### Raw and Clean Data
+# Data
+## Raw and Clean Data
 Consistent with Kowall et al. (2025), data from waves 1-7 (excluding wave 3) of the
 Survey of Health, Ageing and Retirement in Europe (SHARE) were used. SHARE is a
 longitudinal panel study conducted across 28 European countries, collecting data on health, social,
 economic and environmental policies, since 2004 (Börsch-Supan et al., 2013; SHARE-ERIC, 2024a, 2024b, 2024c, 2024d, 2024e, 2024f) .
 
-#### Accessing the Data
+### Accessing the Data
 Because the data from the Survey of Health, Ageing, and Retirement
 in Europe (SHARE) are only available after registration, they cannot be publicly shared on github. 
 
