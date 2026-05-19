@@ -59,13 +59,18 @@ remained (`decision_space.csv`). These were stored in the [decision space folder
 ## Sampled Universes
 Because the number of reasonable universes grows exponentially with the number of
 decisions and their options, Round Robin sampling was used for approximating multiverse results. 
+First, row numbers were mapped for each option, to make the sampling more computationally efficient, see folder 'universe_rownumebers`.
 The sampled universes can be found [here](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/sampled_universes).
 
-## Scripts
+## Results
+In this folder, all multiverse results (including test results that can be ignored) are stored. 
+Because the files contain the date on which the multiverse results were obtained, the results files are not overwritten. 
+
+# Scripts
 
 
 
-## Docs
+# Docs
 In this file, the manusctipts of the final thesis, as well as the intermediate research report can be found.
 
 
