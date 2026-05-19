@@ -71,13 +71,28 @@ decisions and their options, Round Robin sampling was used for approximating mul
 First, row numbers were mapped for each option, to make the sampling more computationally efficient, see folder 'universe_rownumebers`.
 The sampled universes can be found [here](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data/sampled_universes).
 
-## Results
+## Results 
 In this folder, all multiverse results (including test results that can be ignored) are stored. 
 Because the files contain the date on which the multiverse results were obtained, the results files are not overwritten. 
 The results that were used for the final thesis are `corrected_results_final_2026-04-28.RDS`.
 
 # Scripts
+This folder contains all R and qmd scripts used to prepare the data, create the decision space, 
+sample the decision space, run the multiverse analysis on this sample and plot the results.
 
+## 01 Data Cleaning
+Because the data consisted of different SPSS data files per topic and per wave, variables from many
+different data frames were combined into one large data set with all relevant variables from all waves.
+
+- `01_select_variables`: Separate cleaning file per wave, selecting the relevant variables from different wave-specific data sets. This was done so it was possible to make wave-specific changes or fixes.
+- `02_variables_to_numeric`: Not all time variables were numeric, so they were converted to numeric.
+- `03_run_all_scripts`: When reproducing these results, it is not necessary to run all wave-specific files individually. Using this R file, all files in `01_` and `02_` are sourced.
+- `04_add_end_of_life_data`: Since the end-of-life data contains the cause of death of people in earlier waves, this dataset could only be merged with the other data after all waves were combined (the merge-IDs of people who died before a wave are not in that same wave). Therefore, in the 04_ file the data from all waves were first merged, and then joined with the end-of-life datasets from SHARE.
+
+## 02 Decision Space
+## 03 Round Robin Sampler
+## 04 Multiverse Analysis
+## 05 Results Plots
 
 
 # Docs
