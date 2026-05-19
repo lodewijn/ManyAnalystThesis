@@ -25,12 +25,13 @@ missing data, choice of statistical model and definitions of outcome variables, 
 population, contribute to variation in the outcomes of many-analyst projects?
 
 ## Data
+### Raw and Clean Data
 Consistent with Kowall et al. (2025), data from waves 1-7 (excluding wave 3) of the
 Survey of Health, Ageing and Retirement in Europe (SHARE) were used. SHARE is a
 longitudinal panel study conducted across 28 European countries, collecting data on health, social,
 economic and environmental policies, since 2004 (Börsch-Supan et al., 2013; SHARE-ERIC, 2024a, 2024b, 2024c, 2024d, 2024e, 2024f) .
 
-### Accessing the Data
+#### Accessing the Data
 Because the data from the Survey of Health, Ageing, and Retirement
 in Europe (SHARE) are only available after registration, they cannot be publicly shared on github. 
 
@@ -49,4 +50,28 @@ An example of which data files are relevant and how they should be placed in the
 folder structure can be found in the [data folder](https://github.com/lodewijn/ManyAnalystThesis/tree/main/data).
 
 
+## Scripts
+
+
+
+## Docs
+In this file, the manusctipts of the final thesis, as well as the intermediate research report can be found.
+
+
+### `ManyAnalystThesisCompendium.Rproj`
+This is the R project file for the repository. It contains the project settings and configuration. Open this project in RStudio before running any of the analysis files.
+
+### `activate.R in renv file`
+Run this file in RStudio before running any of the analysis files to make sure correct package versions are installed.
+
+# Ethics
+Ethical approval was granted by Ethics Review Board of the Faculty of Social & Behavioural Sciences at Utrecht University. The ethical approval case number is 25-2021.
+
+# License
+This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
+
+# Permissions and Access
+This archive will indefinitely be publicly available on GitHub. 
+Full responsibility for the content of this archive lies with Loesje Ubbink. 
+In the case of questions, do not hesitate to contact me by emailing l.ubbink@students.uu.nl or loes.ubbink@gmail.com.
 
