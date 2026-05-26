@@ -51,7 +51,7 @@ author:
 
 . . . 
 
-- **Case study:** @kowall_marital_2025 many-analyst project
+- **Case study:** @kowall_marital_2025 many-analyst project.
 - 16 teams, 6 decisions
 
 
