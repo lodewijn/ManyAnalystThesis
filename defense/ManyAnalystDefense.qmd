@@ -1,0 +1,48 @@
+---
+title: "Variation in Many-Analyst Projects: Harmful or Helpful?"
+format:
+  revealjs:
+    theme: uu.scss
+    logo: UU_logo_2021_EN_RGB.png
+output: pdf
+bibliography: ref_10-05-26.bib
+author: 
+- name: Loesje Ubbink
+  orcid: 0009-0009-3718-8952
+  affiliations:
+      - name: Methodology & Statistics, Utrecht University
+- name: Suzanne Hoogeveen
+  orcid: 0000-0002-1304-8615
+  affiliations:
+      - name: Methodology & Statistics, Utrecht University
+---
+
+## Reproducibility Crisis
+
+- Questionable research practices
+- Many-analyst projects: same data, same question, \
+**different** results
+
+\
+
+- Methodological noise or substantively meaningful differences?
+
+
+## Sources of Variation
+
+- Many-analyst projects **describe** but **do not quantify**
+
+## Present Study
+
+
+## Methods
+
+
+## Results
+
+
+## Discussion
+
+
+
+
