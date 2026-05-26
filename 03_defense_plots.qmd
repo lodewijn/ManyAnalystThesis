@@ -1,0 +1,130 @@
+---
+title: "Untitled"
+format: html
+---
+
+#### SETUP ####
+```{r, warning=F, message=FALSE}
+# Load required packages
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+library(specr)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(kSamples)
+```
+
+```{r}
+# Load data
+df_small <- readRDS(here("data/results/all_models_final_results_1920_2026-04-15.RDS"))
+df_large <- readRDS(here("data/results/corrected_results_final_2026-04-28.RDS"))
+
+# Create color gradient function
+gradient <- colorRampPalette(c("#D55E00", "#56B4E9"))
+```
+
+#### NAs ####
+```{r}
+# Replace Inf and 0.000 by NA
+# as both indicate model non-convergence
+df_large <- df_large %>%
+  mutate(RR = ifelse(model_type == "GEE" & (RR == Inf | RR == 0), NA, RR),
+         conf.low = ifelse(model_type == "GEE" & (conf.low == Inf | conf.low == 0), NA, conf.low),
+         conf.high = ifelse(model_type == "GEE" & (conf.high == Inf | conf.high == 0), NA, conf.high))
+
+# How many NAs?
+df_large %>%
+  summarise(na_count = sum(is.na(RR)))
+
+# How are NAs distributed per decision?
+df_large %>%
+  group_by(model_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(data_type) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(outcome_label) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(exclusion) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large %>%
+  group_by(missing_data) %>%
+  summarise(na_count = sum(is.na(RR)))
+
+df_large <- df_large |>
+  filter(!is.na(RR))
+```
+#### ADJUSTMENT LABEL PLOT #### 
+```{r}
+#### ADJUSTMENT LABEL #### 
+ADJ_colours <- gradient(length(unique(df_large$adjustment_label)))
+
+ADJ <- ggplot(df_large, aes(x = RR, colour = adjustment_label)) +
+  geom_density(linewidth = 0.8) +
+  scale_colour_manual(values = alpha(ADJ_colours, 0.6)) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "black") +
+  theme_minimal() + labs(y = "Density", title = "Adjustment Set", caption = "All orange densities include age as a confounder, all blue densities do not.") + theme(legend.position="none")
+
+ADJ
+
+# Create binary indicators for each confounder
+df_adj <- df_large %>%
+  mutate(
+    has_age = grepl("age_int", adjustment_label, ignore.case = TRUE),
+    has_sex = grepl("dn042_", adjustment_label, ignore.case = TRUE),
+  )
+
+# Plot density for each confounder
+dens_per_confounder <- df_adj %>%
+  pivot_longer(
+    cols = starts_with("has_"),
+    names_to = "confounder",
+    values_to = "included"
+  ) %>%
+  mutate(confounder = gsub("has_", "", confounder) %>% str_to_title()) %>%
+  ggplot(aes(x = RR, colour = included)) +
+  geom_density(alpha = 0.5) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  facet_wrap(~ confounder, ncol = 3) +
+  scale_colour_manual(
+    name = "Confounder",
+    values = c("TRUE" = "#56B4E9", "FALSE" = "#D55E00"),
+    labels = c("TRUE" = "Included", "FALSE" = "Excluded")
+  ) +
+  labs(x = "RR", y = "Density", title = "Density plots of RR per adjustment variable",
+    subtitle = "Each panel shows densities when including/excluding a specific adjustment variable",
+    caption = "Note: Dashed line indicates RR = 1") +
+  theme_minimal() +
+  theme(
+    plot.title     = element_text(face = "bold", size = 22, hjust = 0.5),
+    plot.subtitle  = element_text(size = 16, hjust = 0.5),
+    plot.caption   = element_text(size = 12, hjust = 0),
+    axis.title     = element_text(size = 16),
+    axis.text      = element_text(size = 13),
+    strip.text     = element_text(size = 15, face = "bold"),
+    legend.title   = element_text(size = 14),
+    legend.text    = element_text(size = 13),
+    legend.position = "bottom"
+  )
+
+dens_per_confounder
+
+ggsave(
+   here("defense/dens_age_sex_defense.png"),
+  plot = dens_per_confounder,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = FALSE
+)
+```
+

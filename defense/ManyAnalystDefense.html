@@ -29,7 +29,27 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-  </style>
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
   <link rel="stylesheet" href="ManyAnalystDefense_files/libs/revealjs/dist/theme/quarto-6c1b1d2d04080d202666cc095f953be7.css">
   <link href="ManyAnalystDefense_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="ManyAnalystDefense_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
@@ -150,37 +170,148 @@ Suzanne Hoogeveen <a href="https://orcid.org/0000-0002-1304-8615" class="quarto-
 </div>
 
 </section>
-<section id="reproducibility-crisis" class="slide level2">
-<h2>Reproducibility Crisis</h2>
+<section id="the-problem" class="slide level2">
+<h2>The Problem</h2>
 <ul>
-<li>Questionable research practices</li>
-<li>Many-analyst projects: same data, same question,<br>
-<strong>different</strong> results</li>
+<li>Many-analyst studies reveal <strong>considerable variability</strong> in effect sizes when independent researchers analyse the <strong>same data</strong>.</li>
+</ul>
+<div class="fragment">
+<blockquote>
+<p>Does this variation reflect <strong>harmful arbitrary noise</strong> or <strong>helpful substantially meaningful differences</strong>?</p>
+</blockquote>
+</div>
+<div class="fragment">
+<p><br>
+</p>
+<ul>
+<li>Classify sources of variation.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Many-analyst studies <strong>describe</strong> but <strong>do not quantify</strong> decision sensitivity.</li>
+</ul>
+</div>
+</section>
+<section id="present-study" class="slide level2">
+<h2>Present Study</h2>
+<ul>
+<li><strong>Method:</strong> Multiverse analysis across analytical paths.</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Inferential statistics on the multiverse using <strong>k-sample Anderson–Darling tests</strong>.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><strong>Case study:</strong> <span class="citation" data-cites="kowall_marital_2025">Kowall et al. (<a href="#/references" role="doc-biblioref" onclick="">2025</a>)</span> many-analyst project</li>
+<li>16 teams, 6 decisions</li>
+</ul>
+<p>&nbsp;</p>
+</div>
+<div class="fragment">
+<blockquote>
+<p>Quantify the relative contribution of harmful vs.&nbsp;helpful decisions to effect size variation.</p>
+</blockquote>
+</div>
+</section>
+<section id="overall-multiverse-results" class="slide level2">
+<h2>Overall Multiverse Results</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>4,913 analyses</li>
 </ul>
 <p><br>
 </p>
 <ul>
-<li>Methodological noise or substantively meaningful differences?</li>
+<li>Effect sizes ranged from<br>
+<strong>0.71</strong> to <strong>1.68</strong>.</li>
 </ul>
-</section>
-<section id="sources-of-variation" class="slide level2">
-<h2>Sources of Variation</h2>
+</div><div class="column" style="width:50%;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Effect size</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Significantly negative (RR &lt; 1, p &lt; .05)</td>
+<td><strong>65.3%</strong></td>
+</tr>
+<tr class="even">
+<td>Significantly positive (RR &gt; 1, p &lt; .05)</td>
+<td><strong>14.3%</strong></td>
+</tr>
+<tr class="odd">
+<td>Non-significant</td>
+<td><strong>20.4%</strong></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p><br>
+</p>
 <ul>
-<li>Many-analyst projects <strong>describe</strong> but <strong>do not quantify</strong></li>
+<li>Different analytical pathways can lead to <strong>different conclusions</strong>.</li>
 </ul>
 </section>
-<section id="present-study" class="slide level2">
-<h2>Present Study</h2>
+<section id="decision-sensitivity" class="slide level2">
+<h2>Decision Sensitivity</h2>
+<ul>
+<li><p><strong>Statistical model choice</strong> → harmful</p></li>
+<li><p><strong>Adjustment set</strong> → helpful</p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Sensitivity to <strong>age</strong> and <strong>sex adjustment</strong> reflect meaningful differences in what was estimated, not arbitrary noise.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="DAG.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
 </section>
-<section id="methods" class="slide level2">
-<h2>Methods</h2>
-</section>
-<section id="results" class="slide level2">
-<h2>Results</h2>
-</section>
+<section id="section" class="slide level2">
+<h2></h2>
+
+<img data-src="dens_age_defense.png" class="quarto-figure quarto-figure-center r-stretch" style="width:80.0%"></section>
 <section id="discussion" class="slide level2">
 <h2>Discussion</h2>
+<ul>
+<li>Effect size variation was <strong>partly meaningful, partly noise</strong>.</li>
+</ul>
+<div class="fragment">
+<ul>
+<li><p>Analytical choices are <strong>rarely independent</strong>.</p></li>
+<li><p>Categorising decisions as purely harmful or helpful is difficult.</p></li>
+</ul>
+<p><br>
+</p>
+</div>
+<div class="fragment">
+<blockquote>
+<p>Different analyses do not always answer the same question, so finding different results is not always <strong>surprising</strong>.</p>
+</blockquote>
+</div>
+<div class="fragment">
+<div style="text-align: center; margin-top: 1em;">
+<p><strong>Thank you! Questions?</strong></p>
+</div>
+</div>
+</section>
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-kowall_marital_2025" class="csl-entry" role="listitem">
+Kowall, Bernd, Linda Juel Ahrenfeldt, Jale Basten, Heiko Becher, Tilman Brand, Julia Braun, Swaantje Casjens, et al. 2025. <span>“Marital Status and Risk of Cardiovascular Disease – a Multi-Analyst Study in Epidemiology.”</span> <em>European Journal of Epidemiology</em> 40 (5): 497–509. <a href="https://doi.org/10.1007/s10654-025-01235-8">https://doi.org/10.1007/s10654-025-01235-8</a>.
+</div>
+</div>
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
@@ -239,7 +370,7 @@ Suzanne Hoogeveen <a href="https://orcid.org/0000-0002-1304-8615" class="quarto-
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
