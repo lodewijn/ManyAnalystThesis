@@ -80,7 +80,6 @@ ADJ
 df_adj <- df_large %>%
   mutate(
     has_age = grepl("age_int", adjustment_label, ignore.case = TRUE),
-    has_sex = grepl("dn042_", adjustment_label, ignore.case = TRUE),
   )
 
 # Plot density for each confounder
@@ -119,7 +118,7 @@ dens_per_confounder <- df_adj %>%
 dens_per_confounder
 
 ggsave(
-   here("defense/dens_age_sex_defense.png"),
+   here("defense/dens_age_defense.png"),
   plot = dens_per_confounder,
   width = 10,
   height = 7,

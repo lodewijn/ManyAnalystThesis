@@ -1,10 +1,6 @@
 ---
 title: "Variation in Many-Analyst Projects: Harmful or Helpful?"
 format: beamer
-  revealjs:
-    theme: uu.scss
-    logo: UU_logo_2021_EN_RGB.png
-    slide-number: true
 bibliography: ref_10-05-26.bib
 author: 
 - name: Loesje Ubbink
@@ -21,14 +17,14 @@ author:
 
 - Many-analyst studies reveal **considerable variability** in effect sizes when independent researchers analyse the **same data**.
 
-. . .
+\ 
 
+. . . 
 
 > Does this variation reflect **harmful arbitrary noise** or **helpful substantially meaningful differences**?
 
 . . .
 
-\
 
 - Classify sources of variation.
 
@@ -64,26 +60,31 @@ author:
 
 ## Overall Multiverse Results
 
-::: {.columns}
-::: {.column width="50%"}
 - 4,913 analyses
 
-\
-
-- Effect sizes ranged from \
+- Effect sizes ranged from
 **0.71** to **1.68**.
-:::
 
-::: {.column width="50%"}
-| Effect size |  |
-|---|---|
-| Significantly negative (RR < 1, p < .05) | **65.3%** |
-| Significantly positive (RR > 1, p < .05) | **14.3%** |
-| Non-significant | **20.4%** |
-:::
-:::
 
-\
+```{r}
+library(kableExtra)
+
+df <- data.frame("Effect Size" = c("Significantly negative (RR < 1)", "Significantly positive (RR > 1)", "Non-significant"), 
+           "Percentage" = c("65.3%", "14.3%", "20.4%"), check.names=F)
+
+df <- df |>
+  kable(
+    booktabs = TRUE,
+    digits = 2,
+    escape = FALSE,
+    linesep = ""
+  ) |>
+  kableExtra::kable_styling(font_size = 11) |>
+  kableExtra::column_spec(1:2, width = "4cm")
+
+df
+```
+
 
 - Different analytical pathways can lead to **different conclusions**.
 
@@ -105,7 +106,7 @@ author:
 
 ## 
 
-![](dens_age_defense.png){width="80%" fig-align="center"}
+![](dens_age_defense.png){width="100%" fig-align="center"}
 
 ---
 
@@ -123,7 +124,7 @@ author:
 
 . . . 
 
-> Different analyses do not always answer the same question, so finding different results is not always **surprising**.
+> Different analyses do not always answer the same question, so finding different results is **not always surprising**.
 
 
 . . .
@@ -135,7 +136,4 @@ author:
 ---
 
 ## References
-
-
-
 
